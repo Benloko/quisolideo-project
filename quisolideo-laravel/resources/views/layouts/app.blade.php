@@ -54,6 +54,12 @@
       .footer-brand img{height:36px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
       .footer-small{color:rgba(255,255,255,0.92);font-size:.95rem}
 
+      /* Footer newsletter */
+      .footer-newsletter{max-width:360px;margin:0 auto}
+      .footer-newsletter .form-control{border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.12);color:#fff}
+      .footer-newsletter .form-control::placeholder{color:rgba(255,255,255,0.78)}
+      .footer-newsletter .btn{border:1px solid rgba(255,255,255,0.35)}
+
       /* Animations */
       @keyframes fadeUp {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
       .footer-bottom .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem}
@@ -135,6 +141,24 @@
               <a href="/partners" class="mx-2">Partenaires</a>
               <a href="/boutique" class="mx-2">Boutique</a>
               <a href="/contact" class="mx-2">Contact</a>
+
+              <div class="footer-newsletter mt-3">
+                <div class="footer-small mb-2">Newsletter : 1–2 emails/mois, sans spam.</div>
+                <form method="POST" action="{{ route('newsletter.store') }}">
+                  @csrf
+                  <div class="input-group input-group-sm">
+                    <input type="email" name="newsletter_email" class="form-control" placeholder="Votre email" value="{{ old('newsletter_email') }}" autocomplete="email" required>
+                    <button class="btn btn-light" type="submit">S'inscrire</button>
+                  </div>
+                </form>
+
+                @if(session('newsletter_success'))
+                  <div class="small mt-2" style="color:rgba(255,255,255,0.95)">{{ session('newsletter_success') }}</div>
+                @endif
+                @error('newsletter_email')
+                  <div class="small mt-2" style="color:rgba(255,255,255,0.95)">{{ $message }}</div>
+                @enderror
+              </div>
             </div>
 
             <div class="footer-item text-end d-flex flex-column align-items-end">

@@ -20,7 +20,7 @@
         <div class="text-muted small">Des formations intensives et modulaires — sélectionnez pour en savoir plus.</div>
       </div>
       <div>
-        <a href="/contact" class="btn btn-outline-primary">Nous contacter</a>
+        <a href="/contact" class="btn btn-success">Nous contacter</a>
       </div>
     </div>
 
