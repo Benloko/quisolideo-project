@@ -15,7 +15,9 @@ class TrainingController extends Controller
 
     public function show($slug)
     {
-        $training = Training::where('slug', $slug)->firstOrFail();
+        $training = Training::where('slug', $slug)
+            ->with(['images', 'videos'])
+            ->firstOrFail();
         return view('trainings.show', compact('training'));
     }
 }

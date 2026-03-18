@@ -9,6 +9,15 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\AdminTrainingController;
+use App\Http\Controllers\AdminPartnerController;
+use App\Http\Controllers\AdminContactMessageController;
+use App\Http\Controllers\AdminProductController;
+use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\TrainingRegistrationController;
+use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureBoutiqueAdmin;
+use App\Http\Middleware\EnsureEntreprenariatAdmin;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -40,18 +49,34 @@ Route::get('/politique', [PagesController::class, 'politique'])->name('politique
 // Trainings routes removed — page will be recreated from scratch on request
 // Recreate trainings listing (clean)
 Route::get('/formations', [TrainingController::class, 'index'])->name('trainings.index');
+Route::get('/formations/{slug}/inscription', [TrainingRegistrationController::class, 'create'])->name('trainings.register');
+Route::post('/formations/{slug}/inscription', [TrainingRegistrationController::class, 'store'])->name('trainings.register.submit');
 Route::get('/formations/{slug}', [TrainingController::class, 'show'])->name('trainings.show');
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
-Route::post('/admin/login', [AdminAuthController::class, 'doLogin'])->name('admin.login.post');
+
+Route::get('/admin/entreprenariat/login', [AdminAuthController::class, 'showEntreprenariatLogin'])->name('admin.entreprenariat.login');
+Route::post('/admin/entreprenariat/login', [AdminAuthController::class, 'doEntreprenariatLogin'])->name('admin.entreprenariat.login.post');
+
+Route::get('/admin/boutique/login', [AdminAuthController::class, 'showBoutiqueLogin'])->name('admin.boutique.login');
+Route::post('/admin/boutique/login', [AdminAuthController::class, 'doBoutiqueLogin'])->name('admin.boutique.login.post');
+
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
 Route::get('/admin/dashboard', function () {
-    if (!session()->has('admin_id')) {
-        return redirect()->route('admin.login');
+    $role = session('admin_role');
+
+    if ($role === 'admin_entreprenariat') {
+        return redirect()->route('admin.entreprenariat.dashboard');
     }
-    return view('admin.dashboard');
-})->name('admin.dashboard');
+
+    if ($role === 'admin_boutique') {
+        return redirect()->route('admin.boutique.dashboard');
+    }
+
+    session()->forget(['admin_id', 'admin_role', 'admin_name']);
+    return redirect()->route('admin.login');
+})->middleware(EnsureAdmin::class)->name('admin.dashboard');
 
 // Simple gallery page (shows images from public/assets/gallery)
 Route::get('/galerie', function () {
@@ -59,22 +84,29 @@ Route::get('/galerie', function () {
 })->name('gallery');
 
 // Admin CRUD routes for trainings & partners (session-protected)
-use App\Http\Controllers\AdminTrainingController;
-use App\Http\Controllers\AdminPartnerController;
-use App\Http\Controllers\AdminContactMessageController;
-use App\Http\Controllers\AdminProductController;
-use App\Http\Controllers\AdminOrderController;
-use App\Http\Middleware\EnsureAdmin;
+// (imports moved to top)
 
-Route::prefix('admin')->middleware(EnsureAdmin::class)->group(function () {
+// Admin — Entreprenariat
+Route::prefix('admin/entreprenariat')->middleware(EnsureEntreprenariatAdmin::class)->group(function () {
+    Route::get('/', function () {
+        return view('admin.dashboard_entreprenariat');
+    })->name('admin.entreprenariat.dashboard');
+
     Route::resource('trainings', AdminTrainingController::class, ['as'=>'admin'])->except(['show']);
     Route::resource('partners', AdminPartnerController::class, ['as'=>'admin'])->except(['show']);
-
-    Route::resource('products', AdminProductController::class, ['as'=>'admin'])->except(['show']);
-    Route::resource('orders', AdminOrderController::class, ['as'=>'admin'])->only(['index', 'show', 'update']);
 
     Route::get('messages', [AdminContactMessageController::class, 'index'])->name('admin.messages.index');
     Route::get('messages/{message}', [AdminContactMessageController::class, 'show'])->name('admin.messages.show');
     Route::patch('messages/{message}/toggle-read', [AdminContactMessageController::class, 'toggleRead'])->name('admin.messages.toggleRead');
     Route::delete('messages/{message}', [AdminContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
+});
+
+// Admin — Boutique
+Route::prefix('admin/boutique')->middleware(EnsureBoutiqueAdmin::class)->group(function () {
+    Route::get('/', function () {
+        return view('admin.dashboard_boutique');
+    })->name('admin.boutique.dashboard');
+
+    Route::resource('products', AdminProductController::class, ['as'=>'admin'])->except(['show']);
+    Route::resource('orders', AdminOrderController::class, ['as'=>'admin'])->only(['index', 'show', 'update']);
 });

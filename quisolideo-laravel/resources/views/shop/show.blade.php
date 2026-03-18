@@ -17,13 +17,47 @@
 
     <div class="row g-4 align-items-start">
       <div class="col-12 col-lg-6">
+        @php
+          $galleryImages = [];
+          if ($product->image) {
+              $galleryImages[] = $product->image;
+          }
+          if ($product->images) {
+              foreach ($product->images as $img) {
+                  $galleryImages[] = $img->path;
+              }
+          }
+          $galleryImages = array_values(array_unique(array_filter($galleryImages)));
+        @endphp
         <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden">
-          @if($product->image)
-            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-100" style="height:420px;object-fit:cover">
+          @if(count($galleryImages))
+            <img id="productMainImage" src="{{ $galleryImages[0] }}" alt="{{ $product->name }}" class="w-100" style="height:420px;object-fit:cover">
           @else
             <div style="height:420px;background:linear-gradient(180deg,rgba(31,143,74,0.03),rgba(31,143,74,0.06))"></div>
           @endif
         </div>
+
+        @if(count($galleryImages) > 1)
+          <div class="mt-3 d-flex flex-wrap gap-2">
+            @foreach($galleryImages as $idx => $src)
+              <button
+                type="button"
+                data-product-thumb
+                data-src="{{ $src }}"
+                class="p-0 border-0 bg-transparent"
+                aria-label="Voir l'image {{ $idx + 1 }}"
+                @if($idx === 0) aria-current="true" @endif
+              >
+                <img
+                  src="{{ $src }}"
+                  alt="{{ $product->name }}"
+                  loading="lazy"
+                  style="width:92px;height:70px;object-fit:cover;border-radius:12px;border:2px solid {{ $idx === 0 ? 'var(--brand-green)' : 'transparent' }}"
+                >
+              </button>
+            @endforeach
+          </div>
+        @endif
       </div>
 
       <div class="col-12 col-lg-6">
@@ -64,4 +98,32 @@
     </div>
   </div>
 </section>
+
+@if(count($galleryImages) > 1)
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const main = document.getElementById('productMainImage');
+      if (!main) return;
+
+      const thumbs = Array.from(document.querySelectorAll('[data-product-thumb]'));
+      thumbs.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const src = btn.getAttribute('data-src');
+          if (!src) return;
+
+          main.setAttribute('src', src);
+
+          thumbs.forEach((b) => {
+            b.removeAttribute('aria-current');
+            const img = b.querySelector('img');
+            if (img) img.style.borderColor = 'transparent';
+          });
+          btn.setAttribute('aria-current', 'true');
+          const activeImg = btn.querySelector('img');
+          if (activeImg) activeImg.style.borderColor = 'var(--brand-green)';
+        });
+      });
+    });
+  </script>
+@endif
 @endsection

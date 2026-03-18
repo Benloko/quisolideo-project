@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4">
   <h2>Modifier produit</h2>
-  <form method="POST" action="{{ route('admin.products.update', $product->id) }}">
+  <form method="POST" action="{{ route('admin.products.update', $product->id) }}" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="mb-3">
@@ -23,8 +23,39 @@
       <textarea name="description" class="form-control" rows="6">{{ old('description', $product->description) }}</textarea>
     </div>
     <div class="mb-3">
-      <label class="form-label">Image (URL)</label>
-      <input name="image" class="form-control" value="{{ old('image', $product->image) }}">
+      <label class="form-label">Image</label>
+      @if($product->image)
+        <div class="mb-2">
+          <img src="{{ $product->image }}" alt="{{ $product->name }}" style="max-width:220px;max-height:140px;object-fit:cover;border-radius:12px">
+        </div>
+      @endif
+      <input type="file" name="image" class="form-control" accept="image/*">
+      <div class="text-muted small mt-1">Laisser vide pour conserver l'image actuelle.</div>
+      @error('image')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Galerie (plusieurs images)</label>
+      @if($product->images && $product->images->count())
+        <div class="mb-2 d-flex flex-wrap gap-2">
+          @foreach($product->images as $img)
+            <img src="{{ $img->path }}" alt="{{ $product->name }}" style="width:90px;height:70px;object-fit:cover;border-radius:12px">
+          @endforeach
+        </div>
+      @endif
+      <input type="file" name="gallery_images[]" class="form-control" accept="image/*" multiple>
+      <div class="text-muted small mt-1">Les nouvelles images s'ajoutent à la galerie existante.</div>
+      @php
+        $firstGalleryItemError = null;
+        foreach ($errors->getMessages() as $key => $messages) {
+            if (str_starts_with($key, 'gallery_images.') && isset($messages[0])) {
+                $firstGalleryItemError = $messages[0];
+                break;
+            }
+        }
+      @endphp
+      @if($firstGalleryItemError)
+        <div class="text-danger small mt-1">{{ $firstGalleryItemError }}</div>
+      @endif
     </div>
     <div class="row">
       <div class="col-md-3 mb-3"><label class="form-label">Prix (FCFA)</label><input name="price" class="form-control" type="number" step="0.01" value="{{ old('price', $product->price) }}" required></div>

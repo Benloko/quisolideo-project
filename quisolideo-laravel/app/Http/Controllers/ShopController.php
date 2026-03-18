@@ -34,7 +34,8 @@ class ShopController extends Controller
 
     public function show(string $slug)
     {
-        $product = Product::where('slug', $slug)
+        $product = Product::with('images')
+            ->where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();
 

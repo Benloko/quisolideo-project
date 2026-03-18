@@ -5,12 +5,12 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header">Admin — Connexion</div>
+        <div class="card-header">{{ $spaceTitle ?? 'Admin — Connexion' }}</div>
         <div class="card-body">
           @if($errors->any())
             <div class="alert alert-danger">{{ $errors->first() }}</div>
           @endif
-          <form method="POST" action="{{ route('admin.login.post') }}">
+          <form method="POST" action="{{ route($postRouteName ?? 'admin.entreprenariat.login.post') }}">
             @csrf
             <div class="mb-3">
               <label class="form-label">Email</label>

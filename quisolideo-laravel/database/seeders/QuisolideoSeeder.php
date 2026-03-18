@@ -11,15 +11,47 @@ class QuisolideoSeeder extends Seeder
     {
         $now = now();
 
-        // Admin user (insert once)
-        if (!DB::table('users')->where('email', 'admin@quisolideo.com')->exists()) {
-            DB::table('users')->insert([
+        // Admin users (2 roles)
+        $admins = [
+            [
                 'email' => 'admin@quisolideo.com',
-                'password' => app(\Illuminate\Hashing\BcryptHasher::class)->make('changeme'),
-                'name' => 'Admin Quisolideo',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
+                'name' => 'Admin Entreprenariat',
+                'role' => 'admin_entreprenariat',
+                'default_password' => 'changeme',
+            ],
+            [
+                'email' => 'boutique@quisolideo.com',
+                'name' => 'Admin Boutique',
+                'role' => 'admin_boutique',
+                'default_password' => 'changeme',
+            ],
+        ];
+
+        foreach ($admins as $admin) {
+            $existing = DB::table('users')->where('email', $admin['email'])->first();
+
+            if (!$existing) {
+                DB::table('users')->insert([
+                    'email' => $admin['email'],
+                    'password' => app(\Illuminate\Hashing\BcryptHasher::class)->make($admin['default_password']),
+                    'name' => $admin['name'],
+                    'role' => $admin['role'],
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+                continue;
+            }
+
+            // Ensure correct role for these admin accounts, without resetting password
+            $updates = [];
+            $updates['role'] = $admin['role'];
+            if (empty($existing->name)) {
+                $updates['name'] = $admin['name'];
+            }
+            if (!empty($updates)) {
+                $updates['updated_at'] = $now;
+                DB::table('users')->where('id', $existing->id)->update($updates);
+            }
         }
 
         // Sample partners (insert if missing by name)

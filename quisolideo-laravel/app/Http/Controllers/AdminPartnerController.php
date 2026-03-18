@@ -24,8 +24,13 @@ class AdminPartnerController extends Controller
             'name'=>'required|string|max:255',
             'description'=>'nullable|string',
             'website'=>'nullable|url',
-            'logo'=>'nullable|string',
+            'logo'=>'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('partners', 'public');
+            $data['logo'] = '/storage/' . $path;
+        }
         Partner::create($data);
         return redirect()->route('admin.partners.index')->with('success','Partenaire créé');
     }
@@ -41,8 +46,15 @@ class AdminPartnerController extends Controller
             'name'=>'required|string|max:255',
             'description'=>'nullable|string',
             'website'=>'nullable|url',
-            'logo'=>'nullable|string',
+            'logo'=>'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('partners', 'public');
+            $data['logo'] = '/storage/' . $path;
+        } else {
+            unset($data['logo']);
+        }
         $partner->update($data);
         return redirect()->route('admin.partners.index')->with('success','Partenaire mis à jour');
     }
