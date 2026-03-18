@@ -20,21 +20,45 @@
   $galleryImages = array_values(array_unique(array_filter($galleryImages)));
   $heroImageSources = array_slice($galleryImages, 0, 5);
 
-    $registrationErrors = $errors->getBag('trainingRegistration');
-    $registrationHasErrors = $registrationErrors && $registrationErrors->any();
-    $registrationAutoOpen = request()->boolean('register') || $registrationHasErrors;
-    $registrationStartStep = 1;
-    if ($registrationHasErrors) {
-        if ($registrationErrors->has('email') || $registrationErrors->has('phone')) {
-        $registrationStartStep = 2;
+    $isLimeEqd = \Illuminate\Support\Str::startsWith((string) $training->slug, 'lime-eqd-');
+
+    $whatsappNumber = preg_replace('/\D+/', '', (string) config('services.whatsapp.number'));
+    $whatsappLines = [
+      'Bonjour Quisolideo 👋',
+      '',
+      "J’ai une question sur la formation : {$training->title}",
+    ];
+    if (!empty($training->price) && (float) $training->price > 0) {
+      $whatsappLines[] = 'Tarif : ' . number_format((float) $training->price, 0, ',', ' ') . ' FCFA';
+    } else {
+      $whatsappLines[] = 'Tarif : Sur devis';
+    }
+    if (!empty($training->seats) && (int) $training->seats > 0) {
+      $whatsappLines[] = 'Places : ' . (int) $training->seats;
+    }
+    $whatsappLines[] = 'Lien : ' . route('trainings.show', $training->slug);
+    $whatsappLines[] = '';
+    $whatsappLines[] = 'Ma question : ';
+    $whatsappMessage = implode("\n", $whatsappLines);
+    $whatsappUrl = $whatsappNumber
+      ? ('https://wa.me/' . $whatsappNumber . '?text=' . rawurlencode($whatsappMessage))
+      : route('contact');
+
+  $registrationErrors = $errors->getBag('trainingRegistration');
+  $registrationHasErrors = $registrationErrors && $registrationErrors->any();
+  $registrationAutoOpen = request()->boolean('register') || $registrationHasErrors;
+  $registrationStartStep = 1;
+  if ($registrationHasErrors) {
+      if ($registrationErrors->has('email') || $registrationErrors->has('phone')) {
+          $registrationStartStep = 2;
       }
-        if ($registrationErrors->has('photo')) {
+      if ($registrationErrors->has('photo')) {
           $registrationStartStep = 3;
-        }
-        if ($registrationErrors->has('message') || $registrationErrors->has('cv')) {
+      }
+      if ($registrationErrors->has('message') || $registrationErrors->has('cv')) {
           $registrationStartStep = 4;
       }
-    }
+  }
 @endphp
 
 <section
@@ -50,11 +74,14 @@
     </div>
   @endif
   <div class="container px-3 px-md-4">
-    <a href="{{ route('trainings.index') }}" class="training-hero-back text-decoration-none">← Retour aux formations</a>
+    <a href="{{ $isLimeEqd ? route('trainings.index', ['tab' => 'programmes']) : route('trainings.index') }}" class="training-hero-back text-decoration-none">← Retour aux formations</a>
 
     <div class="row g-4 align-items-end mt-2">
       <div class="col-12">
         <div class="mt-2 d-flex flex-wrap gap-2 reveal" data-reveal-delay="0">
+          @if($isLimeEqd)
+            <span class="section-badge">Programme LIME / EQD</span>
+          @endif
           <span class="section-badge">Formation <span class="emoji-twinkle" aria-hidden="true">✨</span></span>
           @if(!empty($training->seats) && (int) $training->seats > 0)
             <span class="section-badge">{{ (int) $training->seats }} places</span>
@@ -219,7 +246,7 @@
                 <div class="training-cta-sub">Dites-nous ce que vous cherchez : on vous propose le format adapté.</div>
                 <div class="d-flex gap-2 flex-wrap mt-3">
                   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#trainingRegistrationModal">S’inscrire 🚀</button>
-                  <a href="{{ route('contact') }}" class="btn btn-outline-secondary">Poser une question</a>
+                  <a href="{{ $whatsappUrl }}" class="btn btn-outline-secondary" target="_blank" rel="noopener noreferrer">J’ai une question</a>
                 </div>
               </div>
             </div>

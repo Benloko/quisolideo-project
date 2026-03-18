@@ -7,10 +7,20 @@ use Illuminate\Http\Request;
 
 class TrainingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $trainings = Training::latest()->take(50)->get();
-        return view('trainings.index', compact('trainings'));
+        $tab = $request->query('tab') === 'programmes' ? 'programmes' : 'formations';
+
+        $query = Training::query()->latest();
+
+        if ($tab === 'programmes') {
+            $query->where('slug', 'like', 'lime-eqd-%');
+        } else {
+            $query->where('slug', 'not like', 'lime-eqd-%');
+        }
+
+        $trainings = $query->take(50)->get();
+        return view('trainings.index', compact('trainings', 'tab'));
     }
 
     public function show($slug)

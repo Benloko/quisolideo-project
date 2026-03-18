@@ -1,12 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $tab = ($tab ?? request()->query('tab')) === 'programmes' ? 'programmes' : 'formations';
+@endphp
 <section class="page-hero page-hero--trainings pt-5 pb-4">
   <div class="container px-3 px-md-4">
     <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
 
-        <h1 class="mb-2">Des parcours concrets, pensés pour le terrain 🚀</h1>
-        <p class="text-muted mb-0" style="max-width:78ch">Clairs, pratiques et orientés résultats. Cliquez sur une formation pour découvrir le programme, les objectifs et le format.</p>
+        <div>
+          <h1 class="mb-2">{{ $tab === 'programmes' ? 'Nos programmes' : 'Nos formations' }}</h1>
+          <p class="text-muted mb-0" style="max-width:78ch">
+            {{
+              $tab === 'programmes'
+                ? 'Programme LIME / EQD : des parcours structurés (incubation, employabilité, renforcement de capacités, réinsertion) pensés pour l’impact.'
+                : 'Clairs, pratiques et orientés résultats. Cliquez sur une formation pour découvrir le programme, les objectifs et le format.'
+            }}
+          </p>
+
+          <div class="mt-3 trainings-tabs" role="tablist" aria-label="Navigation formations et programmes">
+            <a
+              href="{{ route('trainings.index') }}"
+              class="trainings-tab {{ $tab === 'formations' ? 'is-active' : '' }}"
+              role="tab"
+              aria-selected="{{ $tab === 'formations' ? 'true' : 'false' }}"
+            >Nos formations</a>
+            <a
+              href="{{ route('trainings.index', ['tab' => 'programmes']) }}"
+              class="trainings-tab {{ $tab === 'programmes' ? 'is-active' : '' }}"
+              role="tab"
+              aria-selected="{{ $tab === 'programmes' ? 'true' : 'false' }}"
+            >Nos programmes</a>
+          </div>
+        </div>
     </div>
   </div>
 </section>
@@ -17,6 +43,7 @@
       @forelse($trainings as $idx => $t)
         @php
           $summary = $t->short_description ?: strip_tags((string) $t->content);
+          $isLimeEqd = \Illuminate\Support\Str::startsWith((string) $t->slug, 'lime-eqd-');
         @endphp
 
         <div class="col-12 col-xl-6">
@@ -31,7 +58,7 @@
 
             <div class="course-body">
               <div class="course-top">
-                <div class="course-kicker">Parcours</div>
+                <div class="course-kicker">{{ $isLimeEqd ? 'Programme LIME / EQD' : 'Parcours' }}</div>
                 <div class="course-chips">
                   @if(!empty($t->seats) && (int) $t->seats > 0)
                     <span class="course-chip">{{ (int) $t->seats }} places</span>

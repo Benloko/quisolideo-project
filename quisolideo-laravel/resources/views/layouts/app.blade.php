@@ -190,9 +190,68 @@
 
       /* Trainings pages — distinct from shop cards */
       .page-hero--trainings h1,
-      .page-hero--training h1{color:var(--brand-dark);font-weight:900;letter-spacing:-0.02em}
+      .page-hero--training h1,
+      .page-hero--partners h1{color:var(--brand-dark);font-weight:900;letter-spacing:-0.02em}
       .page-hero--trainings p,
-      .page-hero--training p{line-height:1.7}
+      .page-hero--training p,
+      .page-hero--partners p{line-height:1.7}
+
+      /* Trainings tabs (Formations / Programmes) */
+      .trainings-tabs{display:inline-flex;gap:.35rem;flex-wrap:wrap;
+        padding:.35rem;
+        border-radius:999px;
+        background:rgba(31,143,74,0.06);
+        border:1px solid rgba(31,143,74,0.16);
+      }
+      .trainings-tab{position:relative;isolation:isolate;
+        display:inline-flex;align-items:center;justify-content:center;
+        padding:.52rem .92rem;
+        border-radius:999px;
+        font-weight:900;
+        letter-spacing:-0.01em;
+        text-decoration:none;
+        color:var(--brand-dark);
+        border:1px solid transparent;
+        transition:transform .38s cubic-bezier(.2,.9,.2,1), box-shadow .38s, background .22s ease, border-color .22s ease, color .22s ease;
+      }
+      .trainings-tab::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;
+        background:linear-gradient(90deg, rgba(31,143,74,0.10), rgba(15,93,42,0.08));
+        opacity:0;
+        transition:opacity .22s ease;
+      }
+      .trainings-tab::after{content:'';position:absolute;inset:-2px;pointer-events:none;border-radius:inherit;
+        background:linear-gradient(120deg,
+          transparent 0%,
+          rgba(31,143,74,0.14) 28%,
+          rgba(255,255,255,0.60) 50%,
+          rgba(31,143,74,0.14) 72%,
+          transparent 100%
+        );
+        transform:translateX(-120%);
+        opacity:0;
+        transition:transform .8s cubic-bezier(.2,.9,.2,1), opacity .22s ease;
+        mix-blend-mode:overlay;
+      }
+      .trainings-tab:hover{transform:translateY(-2px);
+        border-color:rgba(31,143,74,0.22);
+        box-shadow:0 22px 60px rgba(11,17,24,0.10), 0 0 0 6px rgba(31,143,74,0.08);
+      }
+      .trainings-tab:hover::before{opacity:1}
+      .trainings-tab:hover::after{transform:translateX(120%);opacity:1}
+      .trainings-tab:focus-visible{outline:none;
+        box-shadow:0 0 0 .22rem rgba(31,143,74,0.26), 0 22px 60px rgba(11,17,24,0.10);
+      }
+
+      .trainings-tab.is-active{color:#fff;
+        background:linear-gradient(90deg,var(--brand-green),var(--brand-dark));
+        border-color:rgba(255,255,255,0.18);
+        box-shadow:0 20px 55px rgba(11,17,24,0.14);
+      }
+      .trainings-tab.is-active::before{opacity:0}
+      .trainings-tab.is-active:hover{transform:translateY(-2px);
+        box-shadow:0 28px 70px rgba(11,17,24,0.18), 0 0 0 6px rgba(31,143,74,0.10);
+      }
+      .trainings-tab.is-active:hover::after{opacity:.9}
 
       /* Training hero — background media (video/image) + readable overlay */
       .training-hero{
@@ -320,6 +379,97 @@
         .course-card{grid-template-columns:1fr}
         .course-media{aspect-ratio:16/9}
       }
+
+      /* Partners page — logo wall */
+      .partners-wall{position:relative;isolation:isolate}
+      .partners-wall::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+        background:
+          radial-gradient(closest-side at 18% 22%, rgba(31,143,74,0.14), transparent 66%),
+          radial-gradient(closest-side at 82% 18%, rgba(31,143,74,0.10), transparent 62%),
+          linear-gradient(180deg, rgba(31,143,74,0.06), rgba(255,255,255,0.00) 58%);
+      }
+      .partners-wall > .container{position:relative;z-index:1}
+      .partners-title{color:var(--brand-dark);font-weight:900;letter-spacing:-0.01em;line-height:1.15}
+
+      .partner-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+      @media (min-width:576px){.partner-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+      @media (min-width:992px){.partner-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+      .partner-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;
+        border-radius:18px;overflow:hidden;
+        background:#fff;
+        border:1px solid rgba(31,143,74,0.26);
+        box-shadow:0 20px 50px rgba(11,17,24,0.08), 0 0 0 1px rgba(31,143,74,0.14) inset;
+        padding:1.05rem 1rem 1rem;
+        text-decoration:none;color:inherit;
+        position:relative;isolation:isolate;
+        transition:transform .45s cubic-bezier(.2,.9,.2,1), box-shadow .45s, border-color .22s ease;
+      }
+      a.partner-tile{cursor:pointer}
+      .partner-tile::after{content:'';position:absolute;inset:-2px;pointer-events:none;border-radius:inherit;
+        background:linear-gradient(120deg,
+          transparent 0%,
+          rgba(31,143,74,0.10) 28%,
+          rgba(255,255,255,0.60) 50%,
+          rgba(31,143,74,0.10) 72%,
+          transparent 100%
+        );
+        transform:translateX(-140%);
+        opacity:0;
+        transition:transform .85s cubic-bezier(.2,.9,.2,1), opacity .22s ease;
+        z-index:2;
+        mix-blend-mode:overlay;
+      }
+      .partner-tile:hover{transform:translateY(-10px);
+        box-shadow:0 42px 110px rgba(11,17,24,0.12), 0 0 0 1px rgba(31,143,74,0.22) inset, 0 0 0 7px rgba(31,143,74,0.10);
+        border-color:rgba(31,143,74,0.42)
+      }
+      .partner-tile:hover::after{transform:translateX(140%);opacity:1}
+      .partner-tile:focus-visible{outline:none;
+        box-shadow:0 0 0 .22rem rgba(31,143,74,0.26), 0 42px 110px rgba(11,17,24,0.12), 0 0 0 1px rgba(31,143,74,0.22) inset
+      }
+
+      .partner-logo-wrap{width:100%;aspect-ratio:3/2;
+        border-radius:16px;
+        display:flex;align-items:center;justify-content:center;
+        background:linear-gradient(180deg,rgba(31,143,74,0.04),rgba(31,143,74,0.08));
+        border:1px solid rgba(31,143,74,0.16);
+        position:relative;z-index:1;
+        overflow:hidden;
+      }
+      .partner-logo{max-width:78%;max-height:78%;object-fit:contain;display:block;
+        opacity:.92;
+        filter:grayscale(.18) contrast(1.02);
+        transition:transform .7s cubic-bezier(.2,.9,.2,1), filter .25s ease, opacity .25s ease;
+      }
+      .partner-tile:hover .partner-logo{transform:scale(1.03);filter:none;opacity:1}
+
+      .partner-fallback{width:72px;height:72px;border-radius:20px;
+        display:flex;align-items:center;justify-content:center;
+        background:rgba(31,143,74,0.10);
+        border:1px solid rgba(31,143,74,0.18);
+        color:var(--brand-dark);
+        font-weight:950;
+        font-size:1.55rem;
+        box-shadow:0 18px 40px rgba(11,17,24,0.08)
+      }
+      .partner-name{margin-top:.7rem;
+        color:var(--brand-dark);
+        font-weight:900;
+        letter-spacing:-0.01em;
+        text-align:center;
+        line-height:1.2;
+        font-size:1.02rem;
+      }
+      .partner-site{margin-top:.35rem;
+        font-size:.86rem;
+        font-weight:800;
+        color:color-mix(in srgb, var(--brand-dark) 88%, black 12%);
+        opacity:.85;
+      }
+      a.partner-tile:hover .partner-site{opacity:1;text-decoration:underline}
+
+      .partners-empty{border-radius:18px;overflow:hidden}
 
       /* Training show */
       .training-content-card{border-radius:18px;overflow:hidden;background:#fff;
@@ -702,8 +852,8 @@
         .footer-newsletter .btn, .footer-social a, .footer-social a svg{transition:none}
         .footer-newsletter .btn::before, .footer-social a::before{transition:none}
         .footer-link, .footer-link::before, .footer-legal a{transition:none}
-        .course-card, .course-media img, .course-chip{transition:none}
-        .course-card::after{transition:none;opacity:0}
+        .course-card, .course-media img, .course-chip, .partner-tile, .partner-logo, .trainings-tab{transition:none}
+        .course-card::after, .partner-tile::after, .trainings-tab::after{transition:none;opacity:0}
         .training-hero-back{transition:none}
         .training-hero-bg-video{transition:none}
         .training-thumb img, .training-thumb video{transition:none}

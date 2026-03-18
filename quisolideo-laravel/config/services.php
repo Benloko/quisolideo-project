@@ -41,4 +41,9 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'whatsapp' => [
+        // E.164 digits only, without "+" and without spaces. Example: 2250700000000
+        'number' => env('WHATSAPP_NUMBER', ''),
+    ],
+
 ];
