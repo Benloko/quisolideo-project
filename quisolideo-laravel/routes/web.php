@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\AdminTrainingController;
 use App\Http\Controllers\AdminPartnerController;
 use App\Http\Controllers\AdminContactMessageController;
 use App\Http\Controllers\AdminProductController;
+use App\Http\Controllers\AdminProductCategoryController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\TrainingRegistrationController;
 use App\Http\Middleware\EnsureAdmin;
@@ -28,15 +30,26 @@ Route::post('/contact', [PagesController::class, 'contactSubmit'])->name('contac
 
 Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store');
 
+// Espace client (compte)
+Route::middleware('guest')->group(function () {
+    Route::get('/compte/connexion', [AccountController::class, 'showLogin'])->name('login');
+    Route::post('/compte/connexion', [AccountController::class, 'login'])->name('login.post');
+    Route::get('/compte/inscription', [AccountController::class, 'showRegister'])->name('register');
+    Route::post('/compte/inscription', [AccountController::class, 'register'])->name('register.post');
+});
+Route::post('/compte/deconnexion', [AccountController::class, 'logout'])->middleware('auth')->name('logout');
+Route::get('/profil', [AccountController::class, 'profile'])->middleware('auth')->name('account.profile');
+
 // Boutique (MVP)
 Route::get('/boutique', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/boutique/categorie/{slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/boutique/panier', [CartController::class, 'show'])->name('cart.show');
 Route::post('/boutique/panier/ajouter', [CartController::class, 'add'])->name('cart.add');
 Route::post('/boutique/panier', [CartController::class, 'update'])->name('cart.update');
 Route::post('/boutique/panier/supprimer', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/boutique/panier/vider', [CartController::class, 'clear'])->name('cart.clear');
-Route::get('/boutique/commande', [CheckoutController::class, 'show'])->name('checkout.show');
-Route::post('/boutique/commande', [CheckoutController::class, 'place'])->name('checkout.place');
+Route::get('/boutique/commande', [CheckoutController::class, 'show'])->middleware('auth')->name('checkout.show');
+Route::post('/boutique/commande', [CheckoutController::class, 'place'])->middleware('auth')->name('checkout.place');
 Route::get('/boutique/paiement/stripe/succes', [CheckoutController::class, 'stripeSuccess'])->name('checkout.stripe.success');
 Route::get('/boutique/paiement/stripe/annule', [CheckoutController::class, 'stripeCancel'])->name('checkout.stripe.cancel');
 Route::post('/stripe/webhook', [CheckoutController::class, 'stripeWebhook'])->name('stripe.webhook');
@@ -107,6 +120,7 @@ Route::prefix('admin/boutique')->middleware(EnsureBoutiqueAdmin::class)->group(f
         return view('admin.dashboard_boutique');
     })->name('admin.boutique.dashboard');
 
+    Route::resource('categories', AdminProductCategoryController::class, ['as'=>'admin'])->except(['show']);
     Route::resource('products', AdminProductController::class, ['as'=>'admin'])->except(['show']);
     Route::resource('orders', AdminOrderController::class, ['as'=>'admin'])->only(['index', 'show', 'update']);
 });

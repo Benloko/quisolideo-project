@@ -207,6 +207,53 @@ HTML,
             }
         }
 
+        // Sample product categories (insert if missing by slug)
+        $categoryRows = [
+            [
+                'name' => 'Papeterie',
+                'slug' => 'papeterie',
+                'description' => 'Carnets et supports utiles au quotidien.',
+                'image' => '/assets/accueil.png',
+            ],
+            [
+                'name' => 'Textile',
+                'slug' => 'textile',
+                'description' => 'T-shirts et articles à l\'identité Quisolideo.',
+                'image' => '/assets/accueil.png',
+            ],
+            [
+                'name' => 'Kits',
+                'slug' => 'kits',
+                'description' => 'Kits et packs pour démarrer plus vite.',
+                'image' => '/assets/accueil.png',
+            ],
+            [
+                'name' => 'Affiches',
+                'slug' => 'affiches',
+                'description' => 'Affiches et visuels pour votre espace.',
+                'image' => '/assets/accueil.png',
+            ],
+        ];
+
+        $categoryIds = [];
+        foreach ($categoryRows as $row) {
+            $existing = DB::table('product_categories')->where('slug', $row['slug'])->first();
+            if (!$existing) {
+                $categoryIds[$row['slug']] = DB::table('product_categories')->insertGetId(array_merge($row, [
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]));
+                continue;
+            }
+
+            $categoryIds[$row['slug']] = $existing->id;
+        }
+
+        $catalogueId = DB::table('product_categories')->where('slug', 'catalogue')->value('id');
+        if ($catalogueId) {
+            $categoryIds['catalogue'] = $catalogueId;
+        }
+
         // Sample products (boutique MVP) (insert if missing by slug)
         $products = [
             [
@@ -218,6 +265,7 @@ HTML,
                 'price' => 2500.00,
                 'stock' => 50,
                 'is_active' => true,
+                'product_category_id' => $categoryIds['papeterie'] ?? ($categoryIds['catalogue'] ?? null),
             ],
             [
                 'name' => 'T-shirt Quisolideo',
@@ -228,6 +276,7 @@ HTML,
                 'price' => 6000.00,
                 'stock' => 30,
                 'is_active' => true,
+                'product_category_id' => $categoryIds['textile'] ?? ($categoryIds['catalogue'] ?? null),
             ],
             [
                 'name' => 'Kit de démarrage — Artisanat',
@@ -238,6 +287,7 @@ HTML,
                 'price' => 12000.00,
                 'stock' => 10,
                 'is_active' => true,
+                'product_category_id' => $categoryIds['kits'] ?? ($categoryIds['catalogue'] ?? null),
             ],
             [
                 'name' => 'Affiche Quisolideo',
@@ -248,6 +298,7 @@ HTML,
                 'price' => 3000.00,
                 'stock' => 25,
                 'is_active' => true,
+                'product_category_id' => $categoryIds['affiches'] ?? ($categoryIds['catalogue'] ?? null),
             ],
         ];
 

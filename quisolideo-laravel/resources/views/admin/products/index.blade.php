@@ -21,7 +21,7 @@
       <div class="list-group-item d-flex justify-content-between align-items-center">
         <div>
           <strong>{{ $p->name }}</strong>
-          <div class="text-muted small">/{{ $p->slug }} · {{ number_format((float)$p->price, 0, ',', ' ') }} FCFA · Stock: {{ $p->stock }}</div>
+          <div class="text-muted small">/{{ $p->slug }} · {{ $p->category?->name ?? '—' }} · {{ number_format((float)$p->price, 0, ',', ' ') }} FCFA · Stock: {{ $p->stock }}</div>
           @if(!$p->is_active)
             <span class="badge text-bg-light">Inactif</span>
           @endif

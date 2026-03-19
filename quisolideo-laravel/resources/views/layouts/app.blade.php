@@ -188,6 +188,59 @@
       .training-image{height:180px;object-fit:cover;width:100%;border-radius:.25rem}
       .btn-primary{background:var(--brand-dark);border-color:var(--brand-dark)}
 
+      /* Shop — categories / products */
+      .shop-category-page{position:relative;isolation:isolate}
+      .shop-category-page::before{content:'';position:absolute;inset:0;z-index:0;
+        background-image:var(--shop-category-bg, none);
+        background-size:cover;background-position:center;
+        opacity:.08;
+        filter:blur(2px);
+        transform:scale(1.03);
+      }
+      .shop-category-page::after{content:'';position:absolute;inset:0;z-index:0;
+        background:linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.96));
+      }
+      .shop-category-page > *{position:relative;z-index:1}
+
+      .shop-product-card{background:#fff;
+        border:1px solid rgba(11,17,24,0.08);
+        border-radius:16px;
+        overflow:hidden;
+        box-shadow:0 18px 45px rgba(11,17,24,0.06);
+        transition:transform .45s cubic-bezier(.2,.9,.2,1), box-shadow .45s;
+        opacity:0;transform:translateY(12px)
+      }
+      .shop-product-card.visible{opacity:1;transform:none}
+      .shop-product-card:hover{transform:translateY(-6px);box-shadow:0 28px 60px rgba(11,17,24,0.10)}
+
+      .shop-product-media{position:relative;overflow:hidden;
+        aspect-ratio:4/3;
+        background:linear-gradient(180deg,rgba(31,143,74,0.03),rgba(31,143,74,0.08));
+      }
+      .shop-product-media img{width:100%;height:100%;object-fit:cover;
+        transition:transform .7s cubic-bezier(.2,.9,.2,1)
+      }
+      .shop-product-card:hover .shop-product-media img{transform:scale(1.04)}
+      .shop-product-media--placeholder{width:100%;height:100%;background:linear-gradient(180deg,rgba(31,143,74,0.03),rgba(31,143,74,0.08))}
+
+      .shop-product-price{position:absolute;left:10px;top:10px;
+        padding:.35rem .55rem;
+        border-radius:999px;
+        background:rgba(255,255,255,0.90);
+        border:1px solid rgba(11,17,24,0.08);
+        font-weight:900;
+        color:var(--brand-dark);
+        font-size:.85rem;
+        backdrop-filter:blur(10px);
+        -webkit-backdrop-filter:blur(10px);
+      }
+      .shop-add-btn{position:absolute;right:10px;bottom:10px;
+        width:42px;height:42px;border-radius:999px;
+        display:flex;align-items:center;justify-content:center;
+        font-weight:900;
+        box-shadow:0 18px 45px rgba(11,17,24,0.14)
+      }
+
       /* Trainings pages — distinct from shop cards */
       .page-hero--trainings h1,
       .page-hero--training h1,
@@ -390,6 +443,46 @@
       }
       .partners-wall > .container{position:relative;z-index:1}
       .partners-title{color:var(--brand-dark);font-weight:900;letter-spacing:-0.01em;line-height:1.15}
+
+      /* Partners page — feature layout (few partners) */
+      .partner-features{display:flex;flex-direction:column;gap:1.5rem}
+      .partner-feature{padding:1.15rem 0}
+      .partner-feature + .partner-feature{border-top:1px solid rgba(31,143,74,0.14)}
+      .partner-feature-media{border-radius:26px;
+        padding:1.6rem 1.4rem;
+        background:
+          radial-gradient(closest-side at 18% 22%, rgba(31,143,74,0.18), transparent 66%),
+          radial-gradient(closest-side at 82% 18%, rgba(31,143,74,0.12), transparent 62%),
+          linear-gradient(180deg, rgba(255,255,255,0.92), rgba(31,143,74,0.05));
+        border:1px solid rgba(31,143,74,0.16);
+        box-shadow:0 28px 80px rgba(11,17,24,0.08);
+        min-height:260px;
+        display:flex;align-items:center;justify-content:center;
+      }
+      .partner-feature-logo{width:100%;
+        height:clamp(220px, 30vw, 360px);
+        object-fit:contain;
+        display:block;
+        filter:contrast(1.02);
+        opacity:.98;
+      }
+      .partner-feature-fallback{width:120px;height:120px;border-radius:34px;
+        display:flex;align-items:center;justify-content:center;
+        background:rgba(31,143,74,0.10);
+        border:1px solid rgba(31,143,74,0.18);
+        color:var(--brand-dark);
+        font-weight:950;
+        font-size:2.3rem;
+        box-shadow:0 18px 44px rgba(11,17,24,0.10)
+      }
+      .partner-feature-name{color:var(--brand-dark);font-weight:950;letter-spacing:-0.02em;line-height:1.12}
+      .partner-feature-desc{color:#495b4a;line-height:1.75;font-size:1.02rem;max-width:80ch}
+      .partner-feature-desc a{color:var(--brand-dark)}
+
+      @media (max-width:991px){
+        .partner-feature-media{min-height:220px;padding:1.35rem 1.15rem;border-radius:22px}
+        .partner-feature-logo{height:clamp(200px, 56vw, 320px)}
+      }
 
       .partner-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
       @media (min-width:576px){.partner-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -857,6 +950,7 @@
         .training-hero-back{transition:none}
         .training-hero-bg-video{transition:none}
         .training-thumb img, .training-thumb video{transition:none}
+        .shop-product-card, .shop-product-media img, .shop-add-btn{transition:none}
       }
     </style>
   </head>
@@ -874,6 +968,11 @@
           <a class="site-nav-link {{ request()->routeIs('trainings.*') ? 'is-active' : '' }}" href="{{ route('trainings.index') }}">Formations</a>
           <a class="site-nav-link {{ request()->routeIs('partners.*') ? 'is-active' : '' }}" href="{{ route('partners.index') }}">Partenaires</a>
           <a class="site-nav-link nav-boutique {{ (request()->routeIs('shop.*') || request()->routeIs('cart.*') || request()->routeIs('checkout.*')) ? 'is-active' : '' }}" href="{{ route('shop.index') }}">Boutique</a>
+          @auth
+            <a class="site-nav-link {{ request()->routeIs('account.*') ? 'is-active' : '' }}" href="{{ route('account.profile') }}">Profil</a>
+          @else
+            <a class="site-nav-link {{ (request()->routeIs('login') || request()->routeIs('register')) ? 'is-active' : '' }}" href="{{ route('login') }}">Connexion</a>
+          @endauth
           <a class="site-nav-link nav-contact {{ request()->routeIs('contact') ? 'is-active' : '' }}" href="{{ route('contact') }}">Contact</a>
         </div>
       </div>
@@ -909,8 +1008,13 @@
 
             <div class="col-6 col-lg-2">
               <div class="footer-title">Boutique</div>
-              <a class="footer-link" href="{{ route('shop.index') }}">Voir les produits</a>
+              <a class="footer-link" href="{{ route('shop.index') }}">Voir les catégories</a>
               <a class="footer-link" href="{{ route('cart.show') }}">Panier</a>
+              @auth
+                <a class="footer-link" href="{{ route('account.profile') }}">Profil</a>
+              @else
+                <a class="footer-link" href="{{ route('login') }}">Connexion</a>
+              @endauth
               <a class="footer-link" href="{{ route('contact') }}">Aide & contact</a>
             </div>
 
@@ -1000,6 +1104,56 @@
       // observe training cards
       const io = new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}})},{threshold:.15});
       document.addEventListener('DOMContentLoaded', ()=>document.querySelectorAll('.training-card').forEach(el=>io.observe(el)));
+    </script>
+
+    <script>
+      // shop: add to cart without redirect
+      document.addEventListener('DOMContentLoaded', function () {
+        const forms = Array.from(document.querySelectorAll('form[data-add-to-cart]'));
+        if (!forms.length) return;
+
+        forms.forEach((form) => {
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = form.querySelector('button[type="submit"]');
+            const original = btn ? btn.innerHTML : '';
+            if (btn) {
+              btn.disabled = true;
+              btn.innerHTML = '…';
+            }
+
+            try {
+              const res = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'Accept': 'application/json',
+                },
+                body: new FormData(form),
+              });
+
+              if (!res.ok) {
+                throw new Error('add_to_cart_failed');
+              }
+
+              if (btn) {
+                btn.innerHTML = '✓';
+                setTimeout(() => {
+                  btn.disabled = false;
+                  btn.innerHTML = original;
+                }, 900);
+              }
+            } catch (err) {
+              if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = original;
+              }
+              alert('Impossible d\'ajouter au panier.');
+            }
+          });
+        });
+      });
     </script>
   </body>
 </html>

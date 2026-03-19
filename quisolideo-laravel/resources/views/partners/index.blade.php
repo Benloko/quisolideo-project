@@ -20,7 +20,57 @@
       <p class="text-muted mb-0" style="max-width:78ch">Institutions, acteurs locaux, entreprises et experts : ensemble, on accélère l’apprentissage, l’innovation et l’impact local.</p>
     </div>
 
-    @if($partners->count())
+    @if($partners->count() === 0)
+      <div class="partners-empty card border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <span class="section-badge">Partenaires</span>
+          <h3 class="h5 mb-2" style="color:var(--brand-dark);font-weight:900">Bientôt en ligne</h3>
+          <p class="text-muted mb-0">Nous mettons à jour la liste de nos partenaires. Revenez bientôt.</p>
+        </div>
+      </div>
+    @elseif($partners->count() <= 3)
+      <div class="partner-features">
+        @foreach($partners as $idx => $p)
+          @php
+            $delay = 60 + ($idx * 90);
+            $initial = mb_strtoupper(mb_substr($p->name ?? 'P', 0, 1));
+          @endphp
+
+          <div class="partner-feature reveal" data-reveal-delay="{{ $delay }}">
+            <div class="row g-4 align-items-center {{ $idx % 2 === 1 ? 'flex-lg-row-reverse' : '' }}">
+              <div class="col-12 col-lg-5">
+                <div class="partner-feature-media" aria-hidden="true">
+                  @if(!empty($p->logo))
+                    <img src="{{ $p->logo }}" alt="" class="partner-feature-logo" loading="lazy" decoding="async">
+                  @else
+                    <div class="partner-feature-fallback">{{ $initial }}</div>
+                  @endif
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-7">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                  <span class="section-badge">Partenaire</span>
+                  @if(!empty($p->website))
+                    <a class="feature-link" href="{{ $p->website }}" target="_blank" rel="noopener noreferrer">Visiter le site →</a>
+                  @endif
+                </div>
+
+                <h3 class="partner-feature-name mt-2 mb-3">{{ $p->name }}</h3>
+
+                <div class="partner-feature-desc">
+                  @if(!empty($p->description))
+                    {!! nl2br(e($p->description)) !!}
+                  @else
+                    <span class="text-muted">Partenaire de confiance engagé à nos côtés.</span>
+                  @endif
+                </div>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    @else
       <div class="partner-grid">
         @foreach($partners as $idx => $p)
           @php
@@ -63,14 +113,6 @@
             </div>
           @endif
         @endforeach
-      </div>
-    @else
-      <div class="partners-empty card border-0 shadow-sm">
-        <div class="card-body p-4 p-md-5">
-          <span class="section-badge">Partenaires</span>
-          <h3 class="h5 mb-2" style="color:var(--brand-dark);font-weight:900">Bientôt en ligne</h3>
-          <p class="text-muted mb-0">Nous mettons à jour la liste de nos partenaires. Revenez bientôt.</p>
-        </div>
       </div>
     @endif
   </div>

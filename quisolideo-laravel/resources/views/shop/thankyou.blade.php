@@ -9,12 +9,15 @@
           <span class="section-badge">Commande</span>
           <h1 class="mb-2" style="color:var(--brand-dark);font-weight:900">Merci !</h1>
           <p class="text-muted" style="line-height:1.7">
-            Votre commande a bien été enregistrée.
+            Votre commande a bien été préparée.
             @if($orderNumber)
               <br>Référence : <strong>{{ $orderNumber }}</strong>
             @endif
           </p>
           <div class="d-flex gap-2 flex-wrap">
+            @if(!empty($whatsappUrl))
+              <a href="{{ $whatsappUrl }}" class="btn btn-success" target="_blank" rel="noopener noreferrer">Ouvrir WhatsApp</a>
+            @endif
             <a href="{{ route('shop.index') }}" class="btn btn-primary">Retour à la boutique</a>
             <a href="/contact" class="btn btn-outline-secondary">Nous contacter</a>
           </div>

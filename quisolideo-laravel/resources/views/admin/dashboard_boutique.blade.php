@@ -18,6 +18,14 @@
   <div class="row">
     <div class="col-md-4">
       <div class="card p-3">
+        <h5>Catégories</h5>
+        <p>Créer et organiser les catégories de la boutique.</p>
+        <a href="{{ route('admin.categories.index') }}" class="btn btn-success btn-sm">Gérer</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-3">
         <h5>Produits</h5>
         <p>Créer et gérer les produits de la boutique.</p>
         <a href="{{ route('admin.products.index') }}" class="btn btn-success btn-sm">Gérer</a>

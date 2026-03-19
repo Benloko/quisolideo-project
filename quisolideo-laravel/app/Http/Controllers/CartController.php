@@ -72,6 +72,15 @@ class CartController extends Controller
 
         $this->saveCart($request, $cart);
 
+        if ($request->expectsJson()) {
+            $cartCount = array_sum(array_map('intval', $cart));
+            return response()->json([
+                'ok' => true,
+                'message' => 'Produit ajouté au panier.',
+                'cart_count' => $cartCount,
+            ]);
+        }
+
         return redirect()->route('cart.show')->with('success', 'Produit ajouté au panier.');
     }
 

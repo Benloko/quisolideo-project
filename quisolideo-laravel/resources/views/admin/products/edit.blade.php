@@ -7,6 +7,15 @@
     @csrf
     @method('PUT')
     <div class="mb-3">
+      <label class="form-label">Catégorie</label>
+      <select name="product_category_id" class="form-select" required>
+        @foreach($categories as $c)
+          <option value="{{ $c->id }}" {{ (string)old('product_category_id', $product->product_category_id) === (string)$c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+        @endforeach
+      </select>
+      @error('product_category_id')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+    </div>
+    <div class="mb-3">
       <label class="form-label">Nom</label>
       <input name="name" class="form-control" value="{{ old('name', $product->name) }}" required>
     </div>

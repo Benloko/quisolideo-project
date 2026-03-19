@@ -93,8 +93,8 @@
                 <span style="color:var(--brand-dark);font-weight:900">{{ number_format((float)$subtotal, 0, ',', ' ') }} FCFA</span>
               </div>
 
-              <a href="{{ route('checkout.show') }}" class="btn btn-success w-100 mt-3">Commander</a>
-              <div class="text-muted small mt-2">Paiement à la livraison ou par carte (Stripe).</div>
+              <a href="{{ route('checkout.show') }}" class="btn btn-success w-100 mt-3">Commander sur WhatsApp</a>
+              <div class="text-muted small mt-2">Vous confirmerez les détails sur WhatsApp.</div>
             </div>
           </div>
         </div>

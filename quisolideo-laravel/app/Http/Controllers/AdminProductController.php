@@ -3,24 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ProductCategory;
 use App\Models\Product;
 
 class AdminProductController extends Controller
 {
     public function index()
     {
-        $products = Product::orderBy('created_at', 'desc')->get();
+        $products = Product::with('category')->orderBy('created_at', 'desc')->get();
         return view('admin.products.index', compact('products'));
     }
 
     public function create()
     {
-        return view('admin.products.create');
+        $categories = ProductCategory::orderBy('name')->get();
+        return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
+            'product_category_id' => 'required|integer|exists:product_categories,id',
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:products,slug',
             'short_description' => 'nullable|string|max:512',
@@ -69,12 +72,14 @@ class AdminProductController extends Controller
     public function edit(Product $product)
     {
         $product->load('images');
-        return view('admin.products.edit', compact('product'));
+        $categories = ProductCategory::orderBy('name')->get();
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
     {
         $data = $request->validate([
+            'product_category_id' => 'required|integer|exists:product_categories,id',
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:products,slug,' . $product->id,
             'short_description' => 'nullable|string|max:512',

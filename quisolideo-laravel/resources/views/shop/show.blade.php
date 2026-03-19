@@ -76,7 +76,7 @@
             @endif
 
             <div class="mt-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
-              <form method="POST" action="{{ route('cart.add') }}" class="d-flex align-items-center gap-2">
+              <form method="POST" action="{{ route('cart.add') }}" class="d-flex align-items-center gap-2" data-add-to-cart>
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="number" name="quantity" min="1" max="99" value="1" class="form-control form-control-sm" style="width:90px">
