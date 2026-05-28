@@ -1,33 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+<div class="container py-4 admin-shell">
+  <div class="admin-page-head mb-3">
     <div>
-      <h2 class="mb-1">Message — {{ $message->name }}</h2>
-      <div class="text-muted small">
-        {{ $message->email }} · Reçu le {{ $message->created_at?->format('d/m/Y à H:i') }}
-        @if($message->read_flag)
-          · <span class="badge text-bg-light">Lu</span>
-        @else
-          · <span class="badge text-bg-success">Nouveau</span>
-        @endif
-      </div>
+      <p class="admin-eyebrow mb-2">Message contact</p>
+      <h1 class="admin-title mb-1">{{ $message->name }}</h1>
+      <p class="admin-sub mb-0">{{ $message->email }} · Recu le {{ $message->created_at?->format('d/m/Y a H:i') }}</p>
     </div>
 
-    <div class="text-nowrap">
-      <a href="{{ route('admin.messages.index') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+    <div class="admin-actions-inline">
+      <a href="{{ route('admin.messages.index') }}" class="btn btn-outline-secondary btn-sm admin-pill-btn">Retour</a>
 
-      <form action="{{ route('admin.messages.toggleRead', $message) }}" method="POST" style="display:inline">
+      <form action="{{ route('admin.messages.toggleRead', $message) }}" method="POST" class="m-0">
         @csrf
         @method('PATCH')
-        <button class="btn btn-outline-secondary btn-sm">{{ $message->read_flag ? 'Marquer non lu' : 'Marquer lu' }}</button>
+        <button class="btn btn-success btn-sm admin-pill-btn">{{ $message->read_flag ? 'Marquer non lu' : 'Marquer lu' }}</button>
       </form>
 
-      <form action="{{ route('admin.messages.destroy', $message) }}" method="POST" style="display:inline" onsubmit="return confirm('Supprimer ce message ?')">
+      <form action="{{ route('admin.messages.destroy', $message) }}" method="POST" class="m-0" onsubmit="return confirm('Supprimer ce message ?')">
         @csrf
         @method('DELETE')
-        <button class="btn btn-danger btn-sm">Supprimer</button>
+        <button class="btn btn-outline-danger btn-sm admin-pill-btn">Supprimer</button>
       </form>
     </div>
   </div>
@@ -36,10 +30,8 @@
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
-  <div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
-      <div style="white-space:pre-wrap;line-height:1.7">{{ $message->message }}</div>
-    </div>
-  </div>
+  <section class="admin-card p-3 p-md-4">
+    <div class="admin-note-block">{{ $message->message }}</div>
+  </section>
 </div>
 @endsection

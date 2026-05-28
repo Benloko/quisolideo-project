@@ -1,46 +1,63 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="page-hero py-4">
-  <div class="container-fluid px-3 px-md-4">
-    <h1 class="mb-1">Profil</h1>
-    <p class="text-muted small mb-0">Votre compte client.</p>
+<section class="page-hero page-hero--account py-4">
+  <div class="container px-3 px-md-4 account-page-head">
+    <div>
+      <span class="section-badge mb-2">Mon compte</span>
+      <h1 class="mb-1">Profil client</h1>
+      <p class="text-muted mb-0">Gerez vos informations et accedez rapidement a vos actions boutique.</p>
+    </div>
   </div>
 </section>
 
-<section class="py-5">
-  <div class="container-fluid px-3 px-md-4">
-    <div class="row g-4">
-      <div class="col-12 col-lg-6">
-        <div class="card border-0 shadow-sm" style="border-radius:16px">
-          <div class="card-body p-4 p-md-5">
-            <h2 class="h5 mb-3" style="color:var(--brand-dark);font-weight:900">Informations</h2>
-
-            <div class="mb-2"><span class="text-muted">Nom :</span> <strong>{{ auth()->user()->name }}</strong></div>
-            <div class="mb-3"><span class="text-muted">Email :</span> <strong>{{ auth()->user()->email }}</strong></div>
-
-            <div class="d-flex gap-2 flex-wrap">
-              <a href="{{ route('cart.show') }}" class="btn btn-outline-secondary">Voir le panier</a>
-              <a href="{{ route('shop.index') }}" class="btn btn-primary">Retour boutique</a>
+<section class="pt-2 pb-5 shop-section">
+  <div class="container px-3 px-md-4 account-shell">
+    <div class="row g-4 align-items-start">
+      <div class="col-12 col-xl-8">
+        <article class="account-main-card">
+          <div class="account-identity">
+            <div class="account-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr((string) auth()->user()->name, 0, 1)) }}</div>
+            <div>
+              <div class="account-name">{{ auth()->user()->name }}</div>
+              <div class="account-email">{{ auth()->user()->email }}</div>
             </div>
+          </div>
 
-            <hr>
+          <div class="account-grid">
+            <div class="account-info-tile">
+              <div class="account-info-label">Nom complet</div>
+              <div class="account-info-value">{{ auth()->user()->name }}</div>
+            </div>
+            <div class="account-info-tile">
+              <div class="account-info-label">Adresse email</div>
+              <div class="account-info-value">{{ auth()->user()->email }}</div>
+            </div>
+          </div>
 
+          <div class="account-actions-row">
+            <a href="{{ route('cart.show') }}" class="btn btn-outline-secondary btn-sm">Voir le panier</a>
+            <a href="{{ route('shop.index') }}" class="btn btn-success btn-sm">Retour boutique</a>
+          </div>
+
+          <div class="account-logout-row">
             <form method="POST" action="{{ route('logout') }}">
               @csrf
-              <button class="btn btn-outline-secondary">Se déconnecter</button>
+              <button class="btn btn-outline-secondary btn-sm" type="submit">Se deconnecter</button>
             </form>
           </div>
-        </div>
+        </article>
       </div>
 
-      <div class="col-12 col-lg-6">
-        <div class="p-4 p-md-5 rounded-4" style="background:rgba(31,143,74,0.06);border:1px solid rgba(31,143,74,0.14)">
-          <div class="fw-semibold" style="color:var(--brand-dark)">Astuce</div>
-          <div class="text-muted" style="line-height:1.7">
-            Pour commander, ajoutez vos produits au panier puis cliquez sur <strong>Commander sur WhatsApp</strong>.
-          </div>
-        </div>
+      <div class="col-12 col-xl-4">
+        <aside class="account-tip-card">
+          <h2>Astuce</h2>
+          <p>
+            Pour commander rapidement, ajoutez vos produits au panier puis cliquez sur
+            <strong>Commander sur WhatsApp</strong>.
+          </p>
+          <a href="{{ route('checkout.show') }}" class="btn btn-success btn-sm w-100">Aller a la commande</a>
+        </aside>
       </div>
     </div>
   </div>

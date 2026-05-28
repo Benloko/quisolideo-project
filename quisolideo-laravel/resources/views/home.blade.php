@@ -3,96 +3,192 @@
 @section('content')
 
 <section class="hero">
-  <div class="container-fluid px-3 px-md-4">
-    <div class="row align-items-center">
-      <div class="col-12 col-lg-5 hero-content text-white">
-        <div class="hero-card">
-          <div class="hero-pill reveal" data-reveal-delay="0">
-            <span class="hero-dot" aria-hidden="true"></span>
-            Entrepreneuriat local · Formations · Mentorat <span class="emoji-twinkle" aria-hidden="true">✨</span>
-          </div>
-
-          <h1 class="hero-title mt-3 mb-2 reveal" data-reveal-delay="80">Transformez votre idée en entreprise 🚀</h1>
-
-          <p class="lead mb-0 reveal" data-reveal-delay="160">Formations concrètes, mentorat et ressources pour avancer étape par étape — jusqu'à l'impact. 🤝</p>
-
-          <div class="mt-4 d-flex flex-wrap gap-2 hero-cta reveal" data-reveal-delay="240">
-            <a href="/formations" class="btn btn-light">Découvrir nos formations</a>
-            <a href="/boutique" class="btn btn-outline-light">Boutique</a>
+  <div class="container px-3 px-md-4">
+    <div class="row align-items-center g-4">
+      <div class="col-12 col-lg-8 text-white">
+        <div class="hero-content reveal" data-reveal-delay="0">
+          <h1 class="hero-title mt-3 mb-3">Transformez vos idees en projets solides</h1>
+          <p class="hero-lead mb-0">Des parcours pratiques, un accompagnement humain et des ressources claires pour avancer avec confiance.</p>
+          <div class="hero-actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ route('trainings.index') }}" class="btn hero-btn hero-btn-primary">Decouvrir les formations</a>
+            <a href="{{ route('shop.index') }}" class="btn hero-btn hero-btn-secondary">Aller a la boutique</a>
           </div>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="hero-floats" aria-hidden="true">
-    <span class="hero-float hero-float--1">🚀</span>
-    <span class="hero-float hero-float--2">💡</span>
-    <span class="hero-float hero-float--3">🤝</span>
-    <span class="hero-float hero-float--4">🌿</span>
+<section class="home-overview py-5">
+  <div class="container px-3 px-md-4">
+    <div class="row g-4 g-lg-5 align-items-start">
+      <div class="col-12 col-lg-6">
+        <span class="section-badge mb-2">A propos</span>
+        <h2 class="home-section-title mb-3">Quisolideo, partenaire de votre progression</h2>
+        <p class="home-section-copy mb-0">
+          Nous accompagnons les jeunes, porteurs de projets et entrepreneurs avec des formations pratiques,
+          du mentorat et un suivi oriente resultats.
+        </p>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="home-value-grid">
+          <article class="home-value-card">
+            <h3>Formations utiles</h3>
+            <p>Des contenus concrets, applicables des les premieres semaines.</p>
+          </article>
+          <article class="home-value-card">
+            <h3>Mentorat cible</h3>
+            <p>Un accompagnement adapte a votre niveau et a vos objectifs.</p>
+          </article>
+          <article class="home-value-card">
+            <h3>Reseau actif</h3>
+            <p>Des liens avec des partenaires, opportunites et acteurs locaux.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-paths pb-5">
+  <div class="container px-3 px-md-4">
+    <div class="row g-3 g-md-4">
+      <div class="col-12 col-lg-6">
+        <article class="home-path-card h-100">
+          <div class="home-path-kicker">Formations</div>
+          <h3>Des parcours adaptes a vos objectifs</h3>
+          <p>Debutant ou deja en activite, vous suivez une methode claire pour avancer et structurer vos projets.</p>
+          <a href="{{ route('trainings.index') }}" class="home-path-link">Voir les formations →</a>
+        </article>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <article class="home-path-card h-100">
+          <div class="home-path-kicker">Boutique</div>
+          <h3>Ressources et produits utiles</h3>
+          <p>Supports, kits et outils pratiques pour apprendre, produire et accelerer votre progression.</p>
+          <a href="{{ route('shop.index') }}" class="home-path-link">Acceder a la boutique →</a>
+        </article>
+      </div>
+    </div>
+
+    <div class="home-impact mt-4 mt-lg-5">
+      <div class="home-impact-item">
+        <strong>+120</strong>
+        <span>apprenants accompagnes</span>
+      </div>
+      <div class="home-impact-item">
+        <strong>+35</strong>
+        <span>projets suivis</span>
+      </div>
+      <div class="home-impact-item">
+        <strong>+20</strong>
+        <span>partenaires mobilises</span>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="featured-gallery py-5">
+  <?php
+    $galleryFiles = glob(public_path('assets/gallery/*.{jpg,jpeg,png,gif,webp}'), GLOB_BRACE) ?: [];
+    sort($galleryFiles);
+    $galleryUrls = array_map(fn ($path) => asset('assets/gallery/' . basename($path)), array_slice($galleryFiles, 0, 18));
+  ?>
+
   <div class="container px-3 px-md-4">
-    <div class="row g-5 align-items-center justify-content-between">
-      <div class="col-12 col-lg-6 order-lg-1">
-        <div class="featured-copy mx-auto p-4 reveal" data-reveal-delay="0">
-          <span class="section-badge">Galerie <span class="emoji-twinkle" aria-hidden="true">✨</span></span>
-          <h2 class="mb-3" style="color:var(--brand-dark);">L’aventure Quisolideo, en images</h2>
-          <p class="text-muted mb-0">Ateliers, mentorat, projets lancés… un aperçu de ce qu’on construit ensemble, sur le terrain.</p>
-
-          <ul class="feature-list mt-4">
-            <li>
-              <strong>Ateliers qui font avancer</strong>
-              <div class="muted">Du concret, des échanges, et des outils applicables dès maintenant.</div>
-            </li>
-            <li>
-              <strong>Projets passés à l’action</strong>
-              <div class="muted">Des idées testées, améliorées et lancées — avec méthode et énergie.</div>
-            </li>
-            <li>
-              <strong>Communauté & événements</strong>
-              <div class="muted">Rencontres, partenariats et moments qui donnent de l’élan.</div>
-            </li>
-          </ul>
-
-          <a href="{{ route('gallery') }}" class="feature-link">Explorer la galerie complète →</a>
+    <div class="gallery-showcase reveal" data-reveal-delay="0">
+      <div class="row g-4 g-lg-5 align-items-center">
+        <div class="col-12 col-lg-5">
+          <span class="section-badge mb-2">Galerie</span>
+          <h2 class="gallery-showcase-title mb-2">L'aventure Quisolideo en images</h2>
+          <p class="gallery-showcase-copy mb-3">Photos terrain, ateliers et moments forts. La previsualisation defile automatiquement, cliquez pour ouvrir la galerie complete.</p>
+          <a href="{{ route('gallery') }}" class="gallery-showcase-link">Ouvrir la galerie →</a>
         </div>
-      </div>
 
-      <div class="col-12 col-lg-6 order-lg-2">
-        <?php
-          $images = glob(public_path('assets/gallery/*.{jpg,jpeg,png,gif,webp}'), GLOB_BRACE) ?: [];
-          $random = count($images) ? $images[array_rand($images)] : null;
-        ?>
-
-        <div class="d-flex justify-content-center">
-          @if($random)
-            <div class="featured-card reveal" data-reveal-delay="120">
-              <div class="featured-media">
-                <img src="{{ asset('assets/gallery/' . basename($random)) }}" alt="Galerie" class="featured-img" loading="lazy" decoding="async">
+        <div class="col-12 col-lg-7">
+          @if(count($galleryUrls))
+            <a
+              href="{{ route('gallery') }}"
+              class="gallery-slider"
+              data-gallery-slider='@json($galleryUrls)'
+              aria-label="Voir la galerie Quisolideo"
+            >
+              <div class="gallery-slider-stage">
+                <img src="{{ $galleryUrls[0] }}" alt="Photo Quisolideo" class="gallery-slide is-active" data-gallery-primary loading="lazy" decoding="async">
+                <img src="{{ $galleryUrls[0] }}" alt="" class="gallery-slide" data-gallery-secondary loading="lazy" decoding="async" aria-hidden="true">
               </div>
-              <div class="featured-caption">
-                <h3>Un aperçu du terrain</h3>
-                <p class="text-muted mb-3">Un instant capturé lors de nos ateliers, rencontres et moments de progression. La suite vous attend dans la galerie.</p>
-                <a href="{{ route('gallery') }}" class="btn btn-success">Explorer la galerie</a>
+              <div class="gallery-slider-footer">
+                <span>Galerie Quisolideo</span>
+                <span class="gallery-slider-cta">Cliquer pour explorer</span>
               </div>
-            </div>
+            </a>
           @else
-            <div class="featured-card featured-card--empty reveal" data-reveal-delay="120">
-              <div class="featured-empty text-center">
-                <div class="featured-empty-icon" aria-hidden="true">📸</div>
-                <h3 class="mt-3 mb-2">Bientôt, en images</h3>
-                <p class="text-muted mb-3">Ateliers, réussites, communauté… cette section se remplira au fil des photos. En attendant, explorez la galerie complète.</p>
-                <a href="{{ route('gallery') }}" class="btn btn-success">Explorer la galerie</a>
-              </div>
-            </div>
+            <a href="{{ route('gallery') }}" class="gallery-slider gallery-slider--empty" aria-label="Voir la galerie Quisolideo">
+              <div class="gallery-empty">Bientot des photos ici. Cliquer pour ouvrir la galerie.</div>
+            </a>
           @endif
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sliders = Array.from(document.querySelectorAll('[data-gallery-slider]'));
+    if (!sliders.length) return;
+
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    sliders.forEach((slider) => {
+      let images = [];
+      try {
+        images = JSON.parse(slider.getAttribute('data-gallery-slider') || '[]') || [];
+      } catch (e) {
+        images = [];
+      }
+
+      if (!Array.isArray(images) || images.length < 2) return;
+
+      const primary = slider.querySelector('[data-gallery-primary]');
+      const secondary = slider.querySelector('[data-gallery-secondary]');
+      if (!primary || !secondary) return;
+
+      let index = 0;
+      let active = primary;
+      let standby = secondary;
+      let busy = false;
+
+      const transitionMs = 900;
+      const slideIntervalMs = 4200;
+
+      const swap = (nextSrc) => {
+        if (busy) return;
+        busy = true;
+
+        standby.src = nextSrc;
+        standby.classList.add('is-active');
+        active.classList.remove('is-active');
+
+        const temp = active;
+        active = standby;
+        standby = temp;
+
+        setTimeout(() => {
+          busy = false;
+        }, transitionMs);
+      };
+
+      if (reducedMotion) return;
+
+      setInterval(() => {
+        index = (index + 1) % images.length;
+        swap(images[index]);
+      }, slideIntervalMs);
+    });
+  });
+</script>
 
 @endsection

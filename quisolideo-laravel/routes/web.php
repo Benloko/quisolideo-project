@@ -16,6 +16,8 @@ use App\Http\Controllers\AdminContactMessageController;
 use App\Http\Controllers\AdminProductController;
 use App\Http\Controllers\AdminProductCategoryController;
 use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminTrainingRegistrationController;
 use App\Http\Controllers\TrainingRegistrationController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureBoutiqueAdmin;
@@ -27,6 +29,7 @@ Route::get('/partners', [PagesController::class, 'partners'])->name('partners.in
 
 Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
 Route::post('/contact', [PagesController::class, 'contactSubmit'])->name('contact.submit');
+Route::get('/a-propos', [PagesController::class, 'about'])->name('about');
 
 Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store');
 
@@ -101,12 +104,13 @@ Route::get('/galerie', function () {
 
 // Admin — Entreprenariat
 Route::prefix('admin/entreprenariat')->middleware(EnsureEntreprenariatAdmin::class)->group(function () {
-    Route::get('/', function () {
-        return view('admin.dashboard_entreprenariat');
-    })->name('admin.entreprenariat.dashboard');
+    Route::get('/', [AdminDashboardController::class, 'entreprenariat'])->name('admin.entreprenariat.dashboard');
 
     Route::resource('trainings', AdminTrainingController::class, ['as'=>'admin'])->except(['show']);
     Route::resource('partners', AdminPartnerController::class, ['as'=>'admin'])->except(['show']);
+    Route::get('registrations', [AdminTrainingRegistrationController::class, 'index'])->name('admin.registrations.index');
+    Route::get('registrations/{registration}', [AdminTrainingRegistrationController::class, 'show'])->name('admin.registrations.show');
+    Route::delete('registrations/{registration}', [AdminTrainingRegistrationController::class, 'destroy'])->name('admin.registrations.destroy');
 
     Route::get('messages', [AdminContactMessageController::class, 'index'])->name('admin.messages.index');
     Route::get('messages/{message}', [AdminContactMessageController::class, 'show'])->name('admin.messages.show');
@@ -116,9 +120,7 @@ Route::prefix('admin/entreprenariat')->middleware(EnsureEntreprenariatAdmin::cla
 
 // Admin — Boutique
 Route::prefix('admin/boutique')->middleware(EnsureBoutiqueAdmin::class)->group(function () {
-    Route::get('/', function () {
-        return view('admin.dashboard_boutique');
-    })->name('admin.boutique.dashboard');
+    Route::get('/', [AdminDashboardController::class, 'boutique'])->name('admin.boutique.dashboard');
 
     Route::resource('categories', AdminProductCategoryController::class, ['as'=>'admin'])->except(['show']);
     Route::resource('products', AdminProductController::class, ['as'=>'admin'])->except(['show']);

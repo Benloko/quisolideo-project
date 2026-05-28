@@ -7,9 +7,25 @@ use Illuminate\Http\Request;
 
 class AdminOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::orderBy('created_at', 'desc')->get();
+        $q = trim((string) $request->query('q', ''));
+        $status = (string) $request->query('status', '');
+
+        $orders = Order::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('order_number', 'like', '%' . $q . '%')
+                        ->orWhere('customer_name', 'like', '%' . $q . '%')
+                        ->orWhere('customer_email', 'like', '%' . $q . '%');
+                });
+            })
+            ->when($status !== '', function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('admin.orders.index', compact('orders'));
     }
 

@@ -1,19 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="page-hero py-4">
-  <div class="container-fluid px-3 px-md-4">
-    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+<section class="page-hero page-hero--shop py-4">
+  <div class="container px-3 px-md-4">
+    <div class="cart-page-head">
       <div>
-        <h1 class="mb-1">Panier</h1>
-        <p class="text-muted small mb-0">Vérifiez votre sélection avant de confirmer la commande.</p>
+        <span class="section-badge mb-2">Panier</span>
+        <h1 class="mb-1">Votre selection</h1>
+        <p class="text-muted mb-0">Verifiez vos produits avant de passer la commande.</p>
       </div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ route('shop.index') }}" class="btn btn-outline-secondary">Continuer vos achats</a>
+
+      <div class="cart-page-actions">
+        <a href="{{ route('shop.index') }}" class="btn btn-outline-secondary btn-sm">Continuer les achats</a>
         @if(count($lines))
           <form method="POST" action="{{ route('cart.clear') }}" class="m-0">
             @csrf
-            <button class="btn btn-outline-secondary">Vider</button>
+            <button class="btn btn-outline-secondary btn-sm" type="submit">Vider</button>
           </form>
         @endif
       </div>
@@ -21,86 +23,99 @@
   </div>
 </section>
 
-<section class="py-5">
-  <div class="container-fluid px-3 px-md-4">
-
+<section class="pt-2 pb-5 shop-section">
+  <div class="container px-3 px-md-4">
     @if(session('success'))
-      <div class="alert alert-success">{{ session('success') }}</div>
+      <div class="alert alert-success mb-4">{{ session('success') }}</div>
     @endif
 
     @if(!count($lines))
-      <div class="alert alert-secondary">Votre panier est vide.</div>
+      <div class="cart-empty-card">
+        <div class="cart-empty-icon" aria-hidden="true">🛒</div>
+        <h2>Votre panier est vide</h2>
+        <p class="mb-0">Ajoutez des produits depuis la boutique pour preparer votre commande.</p>
+        <a href="{{ route('shop.index') }}" class="btn btn-success btn-sm mt-3">Explorer la boutique</a>
+      </div>
     @else
-      <div class="row g-4">
-        <div class="col-12 col-lg-8">
-          <form method="POST" action="{{ route('cart.update') }}">
+      <div class="row g-4 align-items-start">
+        <div class="col-12 col-xl-8">
+          <form method="POST" action="{{ route('cart.update') }}" class="cart-lines-wrap">
             @csrf
-            <div class="list-group">
-              @foreach($lines as $line)
-                @php($p = $line['product'])
-                <div class="list-group-item d-flex justify-content-between align-items-center gap-3">
-                  <div class="d-flex align-items-center gap-3">
-                    @if($p->image)
-                      <img src="{{ $p->image }}" alt="{{ $p->name }}" style="width:64px;height:64px;object-fit:cover;border-radius:12px">
-                    @else
-                      <div style="width:64px;height:64px;border-radius:12px;background:rgba(31,143,74,0.10)"></div>
-                    @endif
-                    <div>
-                      <div class="fw-bold" style="color:var(--brand-dark)">{{ $p->name }}</div>
-                      <div class="text-muted small">{{ number_format((float)$p->price, 0, ',', ' ') }} FCFA</div>
-                    </div>
-                  </div>
 
-                  <div class="d-flex align-items-center gap-3">
-                    <input type="number" name="quantities[{{ $p->id }}]" min="0" max="99" value="{{ $line['quantity'] }}" class="form-control form-control-sm" style="width:90px">
-                    <div class="text-muted small" style="min-width:130px;text-align:right">
-                      {{ number_format((float)$line['line_total'], 0, ',', ' ') }} FCFA
-                    </div>
+            @foreach($lines as $line)
+              @php($p = $line['product'])
+              <article class="cart-line-item">
+                <a href="{{ route('shop.show', $p->slug) }}" class="cart-line-media" aria-label="{{ $p->name }}">
+                  @if($p->image)
+                    <img src="{{ $p->image }}" alt="{{ $p->name }}" loading="lazy">
+                  @else
+                    <div class="cart-line-placeholder"></div>
+                  @endif
+                </a>
+
+                <div class="cart-line-main">
+                  <h3 class="cart-line-name">{{ $p->name }}</h3>
+                  <div class="cart-line-price">{{ number_format((float)$p->price, 0, ',', ' ') }} FCFA</div>
+
+                  <div class="cart-line-controls">
+                    <label class="visually-hidden" for="qty_{{ $p->id }}">Quantite</label>
+                    <input
+                      id="qty_{{ $p->id }}"
+                      type="number"
+                      name="quantities[{{ $p->id }}]"
+                      min="0"
+                      max="99"
+                      value="{{ $line['quantity'] }}"
+                      class="form-control form-control-sm cart-qty-input"
+                    >
+
+                    <div class="cart-line-total">{{ number_format((float)$line['line_total'], 0, ',', ' ') }} FCFA</div>
 
                     <button
                       type="submit"
                       name="product_id"
                       value="{{ $p->id }}"
                       formaction="{{ route('cart.remove') }}"
-                      class="btn btn-danger btn-sm"
-                    >×</button>
+                      class="btn btn-outline-danger btn-sm cart-remove-btn"
+                      aria-label="Retirer {{ $p->name }}"
+                    >
+                      ✕
+                    </button>
                   </div>
                 </div>
-              @endforeach
-            </div>
+              </article>
+            @endforeach
 
-            <div class="mt-3 d-flex justify-content-end">
-              <button class="btn btn-primary">Mettre à jour</button>
+            <div class="cart-update-row">
+              <button class="btn btn-success cart-update-btn" type="submit">Mettre a jour le panier</button>
             </div>
           </form>
         </div>
 
-        <div class="col-12 col-lg-4">
-          <div class="card border-0 shadow-sm" style="border-radius:16px">
-            <div class="card-body p-4">
-              <h2 class="h5 mb-3" style="color:var(--brand-dark);font-weight:900">Récapitulatif</h2>
-              <div class="d-flex justify-content-between">
-                <span class="text-muted">Sous-total</span>
-                <strong>{{ number_format((float)$subtotal, 0, ',', ' ') }} FCFA</strong>
-              </div>
-              <div class="d-flex justify-content-between mt-2">
-                <span class="text-muted">Livraison</span>
-                <strong>Sur demande</strong>
-              </div>
-              <hr>
-              <div class="d-flex justify-content-between">
-                <span style="color:var(--brand-dark);font-weight:900">Total</span>
-                <span style="color:var(--brand-dark);font-weight:900">{{ number_format((float)$subtotal, 0, ',', ' ') }} FCFA</span>
-              </div>
+        <div class="col-12 col-xl-4">
+          <aside class="cart-summary-card">
+            <h2>Recapitulatif</h2>
 
-              <a href="{{ route('checkout.show') }}" class="btn btn-success w-100 mt-3">Commander sur WhatsApp</a>
-              <div class="text-muted small mt-2">Vous confirmerez les détails sur WhatsApp.</div>
+            <div class="cart-summary-line">
+              <span>Sous-total</span>
+              <strong>{{ number_format((float)$subtotal, 0, ',', ' ') }} FCFA</strong>
             </div>
-          </div>
+            <div class="cart-summary-line">
+              <span>Livraison</span>
+              <strong>Sur demande</strong>
+            </div>
+
+            <div class="cart-summary-total">
+              <span>Total</span>
+              <strong>{{ number_format((float)$subtotal, 0, ',', ' ') }} FCFA</strong>
+            </div>
+
+            <a href="{{ route('checkout.show') }}" class="btn btn-success w-100 cart-checkout-btn">Commander sur WhatsApp</a>
+            <p class="cart-summary-note mb-0">Vous finaliserez les details de livraison et paiement sur WhatsApp.</p>
+          </aside>
         </div>
       </div>
     @endif
-
   </div>
 </section>
 @endsection

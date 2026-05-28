@@ -1,84 +1,77 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+<div class="container py-4 admin-shell">
+  <div class="admin-page-head mb-3">
     <div>
-      <h2 class="mb-1">Commande {{ $order->order_number }}</h2>
-      <div class="text-muted small">{{ $order->created_at?->format('d/m/Y à H:i') }} · Paiement: {{ $order->payment_method }} · Statut paiement: {{ $order->payment_status ?? 'unpaid' }}</div>
+      <p class="admin-eyebrow mb-2">Commande</p>
+      <h1 class="admin-title mb-1">{{ $order->order_number }}</h1>
+      <p class="admin-sub mb-0">{{ $order->created_at?->format('d/m/Y a H:i') }} · Paiement: {{ $order->payment_method }} ({{ $order->payment_status ?? 'unpaid' }})</p>
     </div>
-    <div>
-      <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
-    </div>
+    <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary btn-sm admin-pill-btn">Retour</a>
   </div>
 
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
-  <div class="row g-4">
+  <div class="row g-3">
     <div class="col-12 col-lg-7">
-      <div class="card">
-        <div class="card-body">
-          <h5>Client</h5>
-          <div><strong>{{ $order->customer_name }}</strong></div>
-          <div class="text-muted">{{ $order->customer_email }}</div>
-          @if($order->customer_phone)<div class="text-muted">{{ $order->customer_phone }}</div>@endif
+      <section class="admin-card p-3 p-md-4">
+        <h2 class="admin-card-title">Client</h2>
+        <p class="mb-1"><strong>{{ $order->customer_name }}</strong></p>
+        <p class="mb-1">{{ $order->customer_email }}</p>
+        <p class="mb-0">{{ $order->customer_phone ?: 'Telephone non renseigne' }}</p>
 
+        <hr>
+        <h3 class="admin-subtitle">Livraison</h3>
+        <p class="mb-1">{{ $order->address_line1 }}</p>
+        @if($order->address_line2)<p class="mb-1">{{ $order->address_line2 }}</p>@endif
+        <p class="mb-0">{{ $order->city }} · {{ $order->country }}</p>
+
+        @if($order->notes)
           <hr>
-          <h5>Livraison</h5>
-          <div class="text-muted">{{ $order->address_line1 }}</div>
-          @if($order->address_line2)<div class="text-muted">{{ $order->address_line2 }}</div>@endif
-          <div class="text-muted">{{ $order->city }} · {{ $order->country }}</div>
+          <h3 class="admin-subtitle">Note client</h3>
+          <div class="admin-note-block">{{ $order->notes }}</div>
+        @endif
+      </section>
 
-          @if($order->notes)
-            <hr>
-            <h5>Note</h5>
-            <div class="text-muted" style="white-space:pre-wrap">{{ $order->notes }}</div>
-          @endif
-        </div>
-      </div>
-
-      <div class="card mt-3">
-        <div class="card-body">
-          <h5>Articles</h5>
-          <div class="list-group">
-            @foreach($order->items as $it)
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong>{{ $it->product_name }}</strong>
-                  <div class="text-muted small">{{ number_format((float)$it->unit_price, 0, ',', ' ') }} FCFA · Qté {{ $it->quantity }}</div>
-                </div>
-                <div class="text-muted">{{ number_format((float)$it->line_total, 0, ',', ' ') }} FCFA</div>
+      <section class="admin-card p-3 p-md-4 mt-3">
+        <h2 class="admin-card-title">Articles</h2>
+        <div class="admin-list mt-3">
+          @foreach($order->items as $it)
+            <article class="admin-list-item">
+              <div>
+                <h2>{{ $it->product_name }}</h2>
+                <p>{{ number_format((float)$it->unit_price, 0, ',', ' ') }} FCFA · Qte {{ $it->quantity }}</p>
               </div>
-            @endforeach
-          </div>
+              <strong>{{ number_format((float)$it->line_total, 0, ',', ' ') }} FCFA</strong>
+            </article>
+          @endforeach
         </div>
-      </div>
+      </section>
     </div>
 
     <div class="col-12 col-lg-5">
-      <div class="card">
-        <div class="card-body">
-          <h5>Statut</h5>
-          <form method="POST" action="{{ route('admin.orders.update', $order) }}">
-            @csrf
-            @method('PATCH')
-            <select name="status" class="form-select">
-              @foreach(['pending' => 'En attente', 'confirmed' => 'Confirmée', 'shipped' => 'Expédiée', 'cancelled' => 'Annulée'] as $k => $label)
-                <option value="{{ $k }}" {{ $order->status === $k ? 'selected' : '' }}>{{ $label }}</option>
-              @endforeach
-            </select>
-            <button class="btn btn-primary mt-2">Mettre à jour</button>
-          </form>
+      <section class="admin-card p-3 p-md-4">
+        <h2 class="admin-card-title">Statut</h2>
+        <form method="POST" action="{{ route('admin.orders.update', $order) }}">
+          @csrf
+          @method('PATCH')
+          <select name="status" class="form-select">
+            @foreach(['pending' => 'En attente', 'confirmed' => 'Confirmee', 'shipped' => 'Expediee', 'cancelled' => 'Annulee'] as $k => $label)
+              <option value="{{ $k }}" {{ $order->status === $k ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+          </select>
+          <button class="btn btn-success btn-sm admin-pill-btn mt-2">Mettre a jour</button>
+        </form>
 
-          <hr>
-          <h5>Totaux</h5>
-          <div class="d-flex justify-content-between"><span class="text-muted">Sous-total</span><strong>{{ number_format((float)$order->subtotal, 0, ',', ' ') }} FCFA</strong></div>
-          <div class="d-flex justify-content-between mt-2"><span class="text-muted">Livraison</span><strong>{{ number_format((float)$order->shipping, 0, ',', ' ') }} FCFA</strong></div>
-          <div class="d-flex justify-content-between mt-2"><span class="text-muted">Total</span><strong>{{ number_format((float)$order->total, 0, ',', ' ') }} FCFA</strong></div>
-        </div>
-      </div>
+        <hr>
+        <h3 class="admin-subtitle">Totaux</h3>
+        <div class="d-flex justify-content-between"><span>Sous-total</span><strong>{{ number_format((float)$order->subtotal, 0, ',', ' ') }} FCFA</strong></div>
+        <div class="d-flex justify-content-between mt-2"><span>Livraison</span><strong>{{ number_format((float)$order->shipping, 0, ',', ' ') }} FCFA</strong></div>
+        <div class="d-flex justify-content-between mt-2"><span>Total</span><strong>{{ number_format((float)$order->total, 0, ',', ' ') }} FCFA</strong></div>
+      </section>
     </div>
   </div>
 </div>

@@ -7,9 +7,21 @@ use App\Models\Training;
 
 class AdminTrainingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $trainings = Training::orderBy('created_at','desc')->get();
+        $q = trim((string) $request->query('q', ''));
+
+        $trainings = Training::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', '%' . $q . '%')
+                        ->orWhere('slug', 'like', '%' . $q . '%')
+                        ->orWhere('short_description', 'like', '%' . $q . '%');
+                });
+            })
+            ->orderBy('created_at','desc')
+            ->get();
+
         return view('admin.trainings.index', compact('trainings'));
     }
 

@@ -23,6 +23,7 @@
     $isLimeEqd = \Illuminate\Support\Str::startsWith((string) $training->slug, 'lime-eqd-');
 
     $whatsappNumber = preg_replace('/\D+/', '', (string) config('services.whatsapp.number'));
+    $hasWhatsapp = $whatsappNumber !== '';
     $whatsappLines = [
       'Bonjour Quisolideo 👋',
       '',
@@ -39,8 +40,12 @@
     $whatsappLines[] = 'Lien : ' . route('trainings.show', $training->slug);
     $whatsappLines[] = '';
     $whatsappLines[] = 'Ma question : ';
+    $whatsappQuestionPrefix = implode("\n", $whatsappLines);
     $whatsappMessage = implode("\n", $whatsappLines);
-    $whatsappUrl = $whatsappNumber
+    $whatsappBaseUrl = $hasWhatsapp
+      ? ('https://wa.me/' . $whatsappNumber)
+      : route('contact');
+    $whatsappUrl = $hasWhatsapp
       ? ('https://wa.me/' . $whatsappNumber . '?text=' . rawurlencode($whatsappMessage))
       : route('contact');
 
@@ -74,7 +79,17 @@
     </div>
   @endif
   <div class="container px-3 px-md-4">
-    <a href="{{ $isLimeEqd ? route('trainings.index', ['tab' => 'programmes']) : route('trainings.index') }}" class="training-hero-back text-decoration-none">← Retour aux formations</a>
+    <a
+      href="{{ $isLimeEqd ? route('trainings.index', ['tab' => 'programmes']) : route('trainings.index') }}"
+      class="training-hero-back training-hero-back--icon text-decoration-none"
+      aria-label="Retour aux formations"
+      title="Retour aux formations"
+    >
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+      <span class="visually-hidden">Retour aux formations</span>
+    </a>
 
     <div class="row g-4 align-items-end mt-2">
       <div class="col-12">
@@ -87,7 +102,7 @@
             <span class="section-badge">{{ (int) $training->seats }} places</span>
           @endif
           <span class="section-badge">Sur inscription</span>
-        </div>
+          </div>
 
         <h1 class="mt-3 mb-2 reveal" data-reveal-delay="80">{{ $training->title }}</h1>
         <p class="mb-0 reveal" data-reveal-delay="140" style="max-width:80ch">
@@ -100,7 +115,7 @@
 
 <section class="py-5 training-show">
   <div class="container px-3 px-md-4">
-    <div class="row g-4">
+    <div class="row g-4 align-items-start">
       <div class="col-12 col-lg-7">
         @if($hasVideos)
           <div class="training-media-card reveal" data-reveal-delay="0">
@@ -200,6 +215,7 @@
               <div class="training-perk">Des exemples concrets + exercices guidés</div>
               <div class="training-perk">Un plan d’action pour avancer dès la fin</div>
             </div>
+
           </div>
         </aside>
       </div>
@@ -246,7 +262,7 @@
                 <div class="training-cta-sub">Dites-nous ce que vous cherchez : on vous propose le format adapté.</div>
                 <div class="d-flex gap-2 flex-wrap mt-3">
                   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#trainingRegistrationModal">S’inscrire 🚀</button>
-                  <a href="{{ $whatsappUrl }}" class="btn btn-outline-secondary" target="_blank" rel="noopener noreferrer">J’ai une question</a>
+                  <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#trainingQuestionModal">J’ai une question</button>
                 </div>
               </div>
             </div>
@@ -256,6 +272,70 @@
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('trainingQuestionModal');
+    const send = document.querySelector('[data-training-question-send]');
+    const input = document.getElementById('trainingQuestionInput');
+
+    if (!modalEl || !send) return;
+
+    const whatsappBase = @json($whatsappBaseUrl);
+    const whatsappPrefix = @json($whatsappQuestionPrefix);
+
+    const buildHref = () => {
+      if (!whatsappBase || !whatsappBase.includes('wa.me')) return;
+      const question = (input?.value || '').trim();
+      const text = whatsappPrefix + (question !== '' ? question : 'Bonjour, j\'ai une question.');
+      send.setAttribute('href', whatsappBase + '?text=' + encodeURIComponent(text));
+    };
+
+    modalEl.addEventListener('shown.bs.modal', () => {
+      input?.focus();
+    });
+
+    send.addEventListener('click', () => {
+      buildHref();
+    });
+
+    input?.addEventListener('input', buildHref);
+  });
+</script>
+
+<div class="modal fade training-question-modal" id="trainingQuestionModal" tabindex="-1" aria-hidden="true" aria-labelledby="trainingQuestionModalTitle">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg rounded-4">
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div>
+            <div class="small text-muted fw-semibold">Contact rapide</div>
+            <div class="h6 mb-1" id="trainingQuestionModalTitle" style="font-weight:900;color:var(--brand-dark)">Poser une question</div>
+            <div class="small text-muted">Votre message sera preparé pour WhatsApp.</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+
+        <div class="mt-3">
+          <label for="trainingQuestionInput" class="training-question-label">Votre question</label>
+          <textarea id="trainingQuestionInput" class="form-control" rows="4" placeholder="Ecrivez votre question ici..."></textarea>
+        </div>
+
+        <div class="training-question-actions mt-3">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+          <a
+            href="{{ $whatsappUrl }}"
+            class="btn btn-success training-question-send-btn"
+            @if($hasWhatsapp) target="_blank" rel="noopener noreferrer" @endif
+            data-training-question-send
+          >
+            Envoyer sur WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div
   class="modal fade training-register-modal"

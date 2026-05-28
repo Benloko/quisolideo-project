@@ -14,6 +14,11 @@ class PagesController extends Controller
         return view('partners.index', compact('partners'));
     }
 
+    public function about()
+    {
+        return view('about');
+    }
+
     public function boutique()
     {
         return view('boutique');

@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 
 class AdminProductCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = ProductCategory::orderBy('name')->get();
+        $q = trim((string) $request->query('q', ''));
+
+        $categories = ProductCategory::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', '%' . $q . '%')
+                        ->orWhere('slug', 'like', '%' . $q . '%')
+                        ->orWhere('description', 'like', '%' . $q . '%');
+                });
+            })
+            ->orderBy('name')
+            ->get();
+
         return view('admin.categories.index', compact('categories'));
     }
 

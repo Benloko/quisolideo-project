@@ -7,9 +7,21 @@ use App\Models\Partner;
 
 class AdminPartnerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $partners = Partner::orderBy('created_at','desc')->get();
+        $q = trim((string) $request->query('q', ''));
+
+        $partners = Partner::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', '%' . $q . '%')
+                        ->orWhere('website', 'like', '%' . $q . '%')
+                        ->orWhere('description', 'like', '%' . $q . '%');
+                });
+            })
+            ->orderBy('created_at','desc')
+            ->get();
+
         return view('admin.partners.index', compact('partners'));
     }
 

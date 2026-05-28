@@ -24,6 +24,14 @@ class ShopController extends Controller
                     ->selectRaw('MIN(price)')
                     ->whereColumn('products.product_category_id', 'product_categories.id')
                     ->where('products.is_active', true),
+                'preview_image' => Product::query()
+                    ->select('image')
+                    ->whereColumn('products.product_category_id', 'product_categories.id')
+                    ->where('products.is_active', true)
+                    ->whereNotNull('products.image')
+                    ->where('products.image', '<>', '')
+                    ->orderBy('created_at', 'desc')
+                    ->limit(1),
             ])
             ->orderBy('name')
             ->get();

@@ -7,7 +7,17 @@
 
 <section class="page-hero page-hero--training training-hero" @if($heroImage) style="--training-hero-image: url('{{ $heroImage }}');" @endif>
   <div class="container px-3 px-md-4">
-    <a href="{{ route('trainings.show', $training->slug) }}" class="training-hero-back text-decoration-none">← Retour à la formation</a>
+    <a
+      href="{{ route('trainings.show', $training->slug) }}"
+      class="training-hero-back training-hero-back--icon text-decoration-none"
+      aria-label="Retour a la formation"
+      title="Retour a la formation"
+    >
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+      <span class="visually-hidden">Retour a la formation</span>
+    </a>
 
     <div class="row g-4 align-items-end mt-2">
       <div class="col-12 col-lg-8">

@@ -1,33 +1,45 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-  <h2>Nouvelle catégorie</h2>
-  <form method="POST" action="{{ route('admin.categories.store') }}" enctype="multipart/form-data">
-    @csrf
-    <div class="mb-3">
-      <label class="form-label">Nom</label>
-      <input name="name" class="form-control" value="{{ old('name') }}" required>
-      @error('name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+<div class="container py-4 admin-shell">
+  <div class="admin-page-head mb-3">
+    <div>
+      <p class="admin-eyebrow mb-2">Boutique</p>
+      <h1 class="admin-title mb-1">Nouvelle categorie</h1>
+      <p class="admin-sub mb-0">Ajoutez une categorie avec son image.</p>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Slug</label>
-      <input name="slug" class="form-control" value="{{ old('slug') }}" required>
-      @error('slug')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Message / description</label>
-      <textarea name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
-      @error('description')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Image</label>
-      <input type="file" name="image" class="form-control" accept="image/*">
-      @error('image')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
-    </div>
+    <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary btn-sm admin-pill-btn">Retour</a>
+  </div>
 
-    <button class="btn btn-success">Créer</button>
-    <a class="btn btn-secondary" href="{{ route('admin.categories.index') }}">Annuler</a>
-  </form>
+  <section class="admin-card p-3 p-md-4">
+    <form method="POST" action="{{ route('admin.categories.store') }}" enctype="multipart/form-data" class="d-grid gap-3">
+      @csrf
+      <div>
+        <label class="form-label">Nom</label>
+        <input name="name" class="form-control" value="{{ old('name') }}" required>
+        @error('name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+      </div>
+      <div>
+        <label class="form-label">Slug</label>
+        <input name="slug" class="form-control" value="{{ old('slug') }}" required>
+        @error('slug')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+      </div>
+      <div>
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
+        @error('description')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+      </div>
+      <div>
+        <label class="form-label">Image</label>
+        <input type="file" name="image" class="form-control" accept="image/*">
+        @error('image')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+      </div>
+
+      <div class="admin-actions-inline">
+        <button class="btn btn-success btn-sm admin-pill-btn">Creer</button>
+        <a class="btn btn-outline-secondary btn-sm admin-pill-btn" href="{{ route('admin.categories.index') }}">Annuler</a>
+      </div>
+    </form>
+  </section>
 </div>
 @endsection

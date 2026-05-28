@@ -8,10 +8,36 @@ use App\Models\Product;
 
 class AdminProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->orderBy('created_at', 'desc')->get();
-        return view('admin.products.index', compact('products'));
+        $q = trim((string) $request->query('q', ''));
+        $categoryId = (string) $request->query('category_id', '');
+        $status = (string) $request->query('status', '');
+
+        $products = Product::query()
+            ->with('category')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', '%' . $q . '%')
+                        ->orWhere('slug', 'like', '%' . $q . '%')
+                        ->orWhere('short_description', 'like', '%' . $q . '%');
+                });
+            })
+            ->when($categoryId !== '', function ($query) use ($categoryId) {
+                $query->where('product_category_id', (int) $categoryId);
+            })
+            ->when($status === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($status === 'inactive', function ($query) {
+                $query->where('is_active', false);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $categories = ProductCategory::orderBy('name')->get();
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()

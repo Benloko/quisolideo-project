@@ -7,9 +7,28 @@ use Illuminate\Http\Request;
 
 class AdminContactMessageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $messages = ContactMessage::orderBy('created_at', 'desc')->get();
+        $q = trim((string) $request->query('q', ''));
+        $read = (string) $request->query('read', '');
+
+        $messages = ContactMessage::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', '%' . $q . '%')
+                        ->orWhere('email', 'like', '%' . $q . '%')
+                        ->orWhere('message', 'like', '%' . $q . '%');
+                });
+            })
+            ->when($read === 'yes', function ($query) {
+                $query->where('read_flag', true);
+            })
+            ->when($read === 'no', function ($query) {
+                $query->where('read_flag', false);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $unreadCount = ContactMessage::where('read_flag', false)->count();
 
         return view('admin.messages.index', compact('messages', 'unreadCount'));

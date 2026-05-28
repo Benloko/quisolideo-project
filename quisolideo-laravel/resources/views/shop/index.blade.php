@@ -1,66 +1,89 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="page-hero py-4">
-  <div class="container-fluid px-3 px-md-4">
-    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
-      <div>
-        <h1 class="mb-1">Boutique</h1>
-        <p class="text-muted small mb-0">Choisissez une catégorie, puis ajoutez vos produits au panier.</p>
-      </div>
-      <div>
-        <a href="{{ route('cart.show') }}" class="btn btn-success">Voir le panier</a>
+<section class="py-4 py-md-5 shop-section">
+  <div class="container px-3 px-md-4">
+    <div class="shop-topbar mb-3 mb-md-4">
+    <p class="shop-intro-note mb-0">
+      <span class="shop-intro-kicker">Boutique Quisolideo</span>
+      Decouvrez une selection de produits utiles et inspires, pensee pour soutenir vos projets, enrichir vos formations et faciliter votre progression au quotidien.
+    </p>
+
+      <div class="catalog-search catalog-search--shop" role="search" aria-label="Rechercher une categorie">
+        <label class="visually-hidden" for="shopSearch">Rechercher une categorie</label>
+        <div class="catalog-search-field">
+          <span class="catalog-search-icon" aria-hidden="true">⌕</span>
+          <input id="shopSearch" type="search" class="catalog-search-input" placeholder="Rechercher une categorie..." autocomplete="off">
+        </div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="py-5">
-  <div class="container-fluid px-3 px-md-4">
 
     @if(session('success'))
-      <div class="alert alert-success">{{ session('success') }}</div>
+      <div class="alert alert-success mb-4">{{ session('success') }}</div>
     @endif
 
     @if($categories->count())
-      <div class="row g-4">
+      <div class="shop-categories-grid">
         @foreach($categories as $idx => $c)
-          <div class="col-12 col-md-6 col-lg-4">
-            <article class="training-card h-100 reveal" data-reveal-delay="{{ $idx * 70 }}">
-              <a href="{{ route('shop.category', $c->slug) }}" class="text-decoration-none text-reset">
-                <div class="training-media">
-                  @if($c->image)
-                    <img src="{{ $c->image }}" alt="{{ $c->name }}" />
-                  @else
-                    <div style="width:100%;height:100%;background:linear-gradient(180deg,rgba(31,143,74,0.03),rgba(31,143,74,0.06))"></div>
-                  @endif
-                  <div class="training-overlay">
-                    <div style="font-weight:800">{{ \Illuminate\Support\Str::limit($c->name, 38) }}</div>
-                    @if($c->min_price !== null)
-                      <div class="training-badge">Dès {{ number_format((float)$c->min_price, 0, ',', ' ') }} FCFA</div>
-                    @endif
-                  </div>
-                </div>
-              </a>
+          @php($cardImage = $c->preview_image ?: $c->image)
+          <a
+            href="{{ route('shop.category', $c->slug) }}"
+            class="shop-category-card reveal"
+            data-reveal-delay="{{ $idx * 70 }}"
+            data-shop-item
+            data-search-text="{{ \Illuminate\Support\Str::lower((string) $c->name) }}"
+            aria-label="{{ $c->name }}"
+          >
+            <div class="shop-category-media">
+              @if($cardImage)
+                <img src="{{ $cardImage }}" alt="{{ $c->name }}" loading="lazy">
+              @else
+                <div class="shop-category-placeholder"></div>
+              @endif
+              <h2 class="shop-category-title">{{ \Illuminate\Support\Str::limit((string) $c->name, 44) }}</h2>
+            </div>
 
-              <div class="p-3 p-md-4">
-                <div class="training-sub">
-                  {{ \Illuminate\Support\Str::limit((string)($c->description ?? ''), 150) }}
-                </div>
-
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
-                  <a href="{{ route('shop.category', $c->slug) }}" class="btn btn-outline-secondary btn-sm">Voir les produits</a>
-                  <span class="text-muted small">{{ (int)$c->products_count }} produit{{ (int)$c->products_count > 1 ? 's' : '' }}</span>
-                </div>
-              </div>
-            </article>
-          </div>
+            <div class="shop-category-foot">
+              <span class="shop-category-link">👉 Voir</span>
+            </div>
+          </a>
         @endforeach
       </div>
-    @else
-      <div class="alert alert-secondary">Aucune catégorie disponible pour le moment.</div>
-    @endif
 
+      <div id="shopSearchEmpty" class="alert alert-light border d-none mt-3 mb-0">Aucune categorie ne correspond a votre recherche.</div>
+    @else
+      <div class="shop-empty-card">
+        <h2 class="h5 mb-2">Boutique en cours de mise a jour</h2>
+        <p class="text-muted mb-0">Les categories et produits seront disponibles tres bientot.</p>
+      </div>
+    @endif
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('shopSearch');
+    if (!input) return;
+
+    const items = Array.from(document.querySelectorAll('[data-shop-item]'));
+    const empty = document.getElementById('shopSearchEmpty');
+    if (!items.length) return;
+
+    const normalize = (value) => (value || '').toString().toLowerCase().trim();
+
+    input.addEventListener('input', function () {
+      const query = normalize(input.value);
+      let visibleCount = 0;
+
+      items.forEach((item) => {
+        const haystack = normalize(item.getAttribute('data-search-text'));
+        const visible = haystack.includes(query);
+        item.classList.toggle('d-none', !visible);
+        if (visible) visibleCount += 1;
+      });
+
+      if (empty) empty.classList.toggle('d-none', visibleCount !== 0);
+    });
+  });
+</script>
 @endsection

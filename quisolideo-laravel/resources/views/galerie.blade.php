@@ -4,94 +4,138 @@
 @php
   $images = glob(public_path('assets/gallery/*.{jpg,jpeg,png,gif,webp}'), GLOB_BRACE) ?: [];
   sort($images, SORT_NATURAL | SORT_FLAG_CASE);
+
   $count = count($images);
-  $per = $count ? (int) ceil($count / 3) : 0;
-  $moments = $count ? array_slice($images, 0, $per) : [];
-  $projets = $count ? array_slice($images, $per, $per) : [];
-  $communaute = $count ? array_slice($images, $per * 2) : [];
+  $chunkSize = $count ? (int) ceil($count / 3) : 0;
+
+  $sections = [
+    [
+      'id' => 'moments',
+      'badge' => 'Moments',
+      'title' => 'Ateliers et moments forts',
+      'copy' => 'Des instants de terrain, de pratique et de progression collective.',
+      'images' => $count ? array_slice($images, 0, $chunkSize) : [],
+    ],
+    [
+      'id' => 'projets',
+      'badge' => 'Projets',
+      'title' => 'Projets concrets',
+      'copy' => 'Des actions et realisations qui passent de l idee a l execution.',
+      'images' => $count ? array_slice($images, $chunkSize, $chunkSize) : [],
+    ],
+    [
+      'id' => 'communaute',
+      'badge' => 'Communaute',
+      'title' => 'Communaute et partenariats',
+      'copy' => 'Rencontres, collaborations et dynamique collective autour des initiatives.',
+      'images' => $count ? array_slice($images, $chunkSize * 2) : [],
+    ],
+  ];
 @endphp
 
-<section class="page-hero py-4">
-  <div class="container-fluid px-3 px-md-4">
-    <h1 class="mb-1">Galerie</h1>
-    <p class="text-muted small mb-0">Ateliers, projets et moments forts — découvrez l’énergie Quisolideo en images.</p>
-    <div class="mt-3 d-flex flex-wrap gap-2">
-      <a href="#moments" class="btn btn-success btn-sm">Moments forts</a>
-      <a href="#projets" class="btn btn-success btn-sm">Projets concrets</a>
-      <a href="#communaute" class="btn btn-success btn-sm">Communauté</a>
+<section class="gallery-page-hero py-5">
+  <div class="container px-3 px-md-4">
+    <div class="gallery-page-head">
+      <div>
+        <span class="section-badge mb-2">Galerie</span>
+        <h1 class="mb-2">Nos actions sur le terrain</h1>
+        <p class="mb-0">Photos d ateliers, projets, accompagnements et evenements Quisolideo.</p>
+      </div>
+      <div class="gallery-page-stats" aria-label="Statistiques galerie">
+        <div class="gallery-page-stat">
+          <strong>{{ $count }}</strong>
+          <span>photos</span>
+        </div>
+        <div class="gallery-page-stat">
+          <strong>3</strong>
+          <span>themes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gallery-page-nav mt-3">
+      @foreach($sections as $s)
+        <a href="#{{ $s['id'] }}" class="gallery-page-nav-link">{{ $s['badge'] }}</a>
+      @endforeach
     </div>
   </div>
 </section>
 
-<section id="moments" class="py-5">
-  <div class="container-fluid px-3 px-md-4">
-    <span class="section-badge">Moments forts</span>
-    <h2 class="h4 mb-1" style="color:var(--brand-dark);font-weight:900">Ateliers, démonstrations, rencontres</h2>
-    <p class="text-muted mb-4" style="max-width:70ch">Des instants clés qui illustrent la progression, la pratique et le partage.</p>
+<section class="gallery-page-body pb-5">
+  <div class="container px-3 px-md-4">
+    @foreach($sections as $section)
+      <div id="{{ $section['id'] }}" class="gallery-group">
+        <div class="gallery-group-head">
+          <span class="gallery-group-badge">{{ $section['badge'] }}</span>
+          <h2>{{ $section['title'] }}</h2>
+          <p>{{ $section['copy'] }}</p>
+        </div>
 
-    @if(count($moments))
-      <div class="row g-3">
-        @foreach($moments as $img)
-          <div class="col-6 col-md-4 col-lg-3">
-            <a href="{{ asset('assets/gallery/' . basename($img)) }}" target="_blank" rel="noopener" class="d-block text-decoration-none">
-              <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden;">
-                <img src="{{ asset('assets/gallery/' . basename($img)) }}" alt="Galerie — Moments forts" class="w-100" style="height:190px;object-fit:cover;">
-              </div>
-            </a>
+        @if(count($section['images']))
+          <div class="gallery-grid">
+            @foreach($section['images'] as $idx => $img)
+              @php
+                $url = asset('assets/gallery/' . basename($img));
+                $isWide = (($idx + 1) % 5) === 0;
+              @endphp
+              <button
+                type="button"
+                class="gallery-card {{ $isWide ? 'gallery-card--wide' : '' }}"
+                data-gallery-open
+                data-src="{{ $url }}"
+                data-alt="{{ $section['title'] }}"
+                aria-label="Voir la photo"
+              >
+                <img src="{{ $url }}" alt="{{ $section['title'] }}" loading="lazy" decoding="async">
+              </button>
+            @endforeach
           </div>
-        @endforeach
+        @else
+          <div class="alert alert-secondary mb-0">Aucune image disponible pour cette section pour le moment.</div>
+        @endif
       </div>
-    @else
-      <div class="alert alert-secondary">Aucune image disponible dans cette section pour le moment.</div>
-    @endif
+    @endforeach
   </div>
 </section>
 
-<section id="projets" class="py-5">
-  <div class="container-fluid px-3 px-md-4">
-    <span class="section-badge">Projets concrets</span>
-    <h2 class="h4 mb-1" style="color:var(--brand-dark);font-weight:900">Du concept à l’action</h2>
-    <p class="text-muted mb-4" style="max-width:70ch">Des réalisations qui montrent le savoir-faire, les résultats et la montée en compétence.</p>
-
-    @if(count($projets))
-      <div class="row g-3">
-        @foreach($projets as $img)
-          <div class="col-6 col-md-4 col-lg-3">
-            <a href="{{ asset('assets/gallery/' . basename($img)) }}" target="_blank" rel="noopener" class="d-block text-decoration-none">
-              <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden;">
-                <img src="{{ asset('assets/gallery/' . basename($img)) }}" alt="Galerie — Projets" class="w-100" style="height:190px;object-fit:cover;">
-              </div>
-            </a>
-          </div>
-        @endforeach
+<div class="modal fade" id="galleryLightbox" tabindex="-1" aria-hidden="true" aria-label="Apercu image">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content gallery-lightbox-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
-    @else
-      <div class="alert alert-secondary">Aucune image disponible dans cette section pour le moment.</div>
-    @endif
-  </div>
-</section>
-
-<section id="communaute" class="py-5">
-  <div class="container-fluid px-3 px-md-4">
-    <span class="section-badge">Communauté</span>
-    <h2 class="h4 mb-1" style="color:var(--brand-dark);font-weight:900">Événements, partenariats, retours</h2>
-    <p class="text-muted mb-4" style="max-width:70ch">Une communauté active : échanges, collaborations et témoignages.</p>
-
-    @if(count($communaute))
-      <div class="row g-3">
-        @foreach($communaute as $img)
-          <div class="col-6 col-md-4 col-lg-3">
-            <a href="{{ asset('assets/gallery/' . basename($img)) }}" target="_blank" rel="noopener" class="d-block text-decoration-none">
-              <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden;">
-                <img src="{{ asset('assets/gallery/' . basename($img)) }}" alt="Galerie — Communauté" class="w-100" style="height:190px;object-fit:cover;">
-              </div>
-            </a>
-          </div>
-        @endforeach
+      <div class="modal-body pt-2">
+        <img src="" alt="" class="gallery-lightbox-image" data-gallery-lightbox-image>
       </div>
-    @else
-      <div class="alert alert-secondary">Aucune image disponible dans cette section pour le moment.</div>
-    @endif
+    </div>
   </div>
-</section>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const lightboxEl = document.getElementById('galleryLightbox');
+    if (!lightboxEl || !window.bootstrap || !window.bootstrap.Modal) return;
+
+    const lightboxImage = lightboxEl.querySelector('[data-gallery-lightbox-image]');
+    const modal = window.bootstrap.Modal.getOrCreateInstance(lightboxEl);
+
+    document.querySelectorAll('[data-gallery-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const src = btn.getAttribute('data-src') || '';
+        const alt = btn.getAttribute('data-alt') || 'Photo galerie';
+        if (!src || !lightboxImage) return;
+
+        lightboxImage.src = src;
+        lightboxImage.alt = alt;
+        modal.show();
+      });
+    });
+
+    lightboxEl.addEventListener('hidden.bs.modal', () => {
+      if (!lightboxImage) return;
+      lightboxImage.src = '';
+      lightboxImage.alt = '';
+    });
+  });
+</script>
 @endsection
